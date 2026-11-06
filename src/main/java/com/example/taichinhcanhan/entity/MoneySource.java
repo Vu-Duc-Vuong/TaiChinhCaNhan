@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,9 @@ public class MoneySource {
           @DecimalMin(value = "0.00")
           @Column(name = "initial_balance", nullable = false, precision = 15, scale = 2)
           private BigDecimal initialBalance = BigDecimal.ZERO;
+
+          @Transient
+          private BigDecimal currentBalance = BigDecimal.ZERO;
 
           @Size(max = 255)
           @Column(length = 255)
@@ -104,6 +108,14 @@ public class MoneySource {
 
           public void setInitialBalance(BigDecimal initialBalance) {
                     this.initialBalance = initialBalance;
+          }
+
+          public BigDecimal getCurrentBalance() {
+                    return currentBalance;
+          }
+
+          public void setCurrentBalance(BigDecimal currentBalance) {
+                    this.currentBalance = currentBalance;
           }
 
           public String getDescription() {

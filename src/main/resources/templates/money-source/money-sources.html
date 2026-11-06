@@ -48,6 +48,7 @@
                                                             <th>Tên nguồn tiền</th>
                                                             <th>Loại</th>
                                                             <th class="text-end">Số dư ban đầu</th>
+                                                            <th class="text-end">Số dư hiện tại</th>
                                                             <th>Mô tả</th>
                                                             <th>Ngày tạo</th>
                                                             <th class="text-end">Thao tác</th>
@@ -70,6 +71,9 @@
                                                             </td>
                                                             <td class="text-end amount-text"
                                                                       th:text="${#numbers.formatDecimal(source.initialBalance, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td class="text-end amount-text"
+                                                                      th:text="${#numbers.formatDecimal(source.currentBalance, 0, 'COMMA', 2, 'POINT')}">
                                                                       0.00</td>
                                                             <td class="description-cell"
                                                                       th:text="${source.description ?: '-'}">-</td>

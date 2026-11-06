@@ -12,7 +12,11 @@ import com.example.taichinhcanhan.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 @Service
 public class TransactionService {
@@ -45,9 +49,10 @@ public class TransactionService {
 
           @Transactional
           public Transaction create(UserAccount userAccount, TransactionRequest request) {
+                    MoneySource moneySource = findOwnedMoneySourceForUpdate(request.getMoneySourceId(), userAccount);
                     Category category = findOwnedCategory(request.getCategoryId(), userAccount);
-                    MoneySource moneySource = findOwnedMoneySource(request.getMoneySourceId(), userAccount);
                     validateCategoryType(request.getType(), category);
+                    validateAvailableBalance(moneySource, userAccount, request.getType(), request.getAmount(), null);
 
                     Transaction transaction = new Transaction();
                     applyRequest(transaction, request, category, moneySource);
@@ -63,17 +68,24 @@ public class TransactionService {
 
           @Transactional
           public Transaction update(Long id, UserAccount userAccount, TransactionRequest request) {
-                    Transaction transaction = findOwnedById(id, userAccount);
+                    Transaction transaction = transactionRepository.findOwnedByIdForUpdate(id, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy giao dịch."));
+                    Map<Long, MoneySource> lockedSources = lockOwnedSources(
+                                        List.of(transaction.getMoneySource().getId(), request.getMoneySourceId()),
+                                        userAccount);
+                    MoneySource moneySource = lockedSources.get(request.getMoneySourceId());
                     Category category = findOwnedCategory(request.getCategoryId(), userAccount);
-                    MoneySource moneySource = findOwnedMoneySource(request.getMoneySourceId(), userAccount);
                     validateCategoryType(request.getType(), category);
+                    validateAvailableBalance(moneySource, userAccount, request.getType(), request.getAmount(), id);
                     applyRequest(transaction, request, category, moneySource);
                     return transactionRepository.save(transaction);
           }
 
           @Transactional
           public void delete(Long id, UserAccount userAccount) {
-                    Transaction transaction = findOwnedById(id, userAccount);
+                    Transaction transaction = transactionRepository.findOwnedByIdForUpdate(id, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy giao dịch."));
+                    lockOwnedSources(List.of(transaction.getMoneySource().getId()), userAccount);
                     transactionRepository.delete(transaction);
           }
 
@@ -83,10 +95,41 @@ public class TransactionService {
                                                             "Danh mục không thuộc người dùng hiện tại."));
           }
 
-          private MoneySource findOwnedMoneySource(Long moneySourceId, UserAccount userAccount) {
-                    return moneySourceRepository.findByIdAndUserAccountId(moneySourceId, userAccount.getId())
+          private MoneySource findOwnedMoneySourceForUpdate(Long moneySourceId, UserAccount userAccount) {
+                    return moneySourceRepository.findOwnedByIdForUpdate(moneySourceId, userAccount.getId())
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                             "Nguồn tiền không thuộc người dùng hiện tại."));
+          }
+
+          private Map<Long, MoneySource> lockOwnedSources(List<Long> sourceIds, UserAccount userAccount) {
+                    Map<Long, MoneySource> sources = new HashMap<>();
+                    for (Long sourceId : new TreeSet<>(sourceIds)) {
+                              sources.put(sourceId, findOwnedMoneySourceForUpdate(sourceId, userAccount));
+                    }
+                    return sources;
+          }
+
+          private void validateAvailableBalance(MoneySource moneySource,
+                              UserAccount userAccount,
+                              TransactionType type,
+                              BigDecimal amount,
+                              Long excludedTransactionId) {
+                    if (type != TransactionType.EXPENSE) {
+                              return;
+                    }
+
+                    BigDecimal income = transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
+                                        userAccount.getId(), moneySource.getId(), TransactionType.INCOME,
+                                        excludedTransactionId);
+                    BigDecimal expense = transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
+                                        userAccount.getId(), moneySource.getId(), TransactionType.EXPENSE,
+                                        excludedTransactionId);
+                    BigDecimal availableBalance = moneySource.getInitialBalance()
+                                        .add(income == null ? BigDecimal.ZERO : income)
+                                        .subtract(expense == null ? BigDecimal.ZERO : expense);
+                    if (amount.compareTo(availableBalance) > 0) {
+                              throw new IllegalArgumentException("Số dư nguồn tiền không đủ cho giao dịch chi tiêu.");
+                    }
           }
 
           private void validateCategoryType(TransactionType transactionType, Category category) {
