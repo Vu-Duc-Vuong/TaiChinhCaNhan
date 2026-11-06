@@ -31,7 +31,8 @@
                               <div class="mb-3">
                                         <label class="form-label" for="initialBalance">Số dư ban đầu</label>
                                         <input class="form-control" id="initialBalance" th:field="*{initialBalance}"
-                                                  type="number" min="0" step="0.01" th:errorclass="is-invalid">
+                                                  type="text" inputmode="decimal" autocomplete="off" data-money-input
+                                                  placeholder="Ví dụ: 1.000.000" th:errorclass="is-invalid">
                                         <div class="invalid-feedback" th:errors="*{initialBalance}"></div>
                               </div>
                               <div class="mb-4">

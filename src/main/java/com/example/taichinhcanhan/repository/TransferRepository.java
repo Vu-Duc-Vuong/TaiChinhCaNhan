@@ -47,6 +47,14 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
       + "group by transfer.toSource.id")
   List<Object[]> summarizeIncomingBalancesByUserId(@Param("userId") Long userId);
 
+  @Query("select transfer from Transfer transfer join fetch transfer.fromSource join fetch transfer.toSource "
+      + "where transfer.userAccount.id = :userId "
+      + "and (transfer.fromSource.id = :sourceId or transfer.toSource.id = :sourceId) "
+      + "order by transfer.transferDate desc, transfer.createdAt desc, transfer.id desc")
+  List<Transfer> findHistoryByUserAndSource(
+      @Param("userId") Long userId,
+      @Param("sourceId") Long sourceId);
+
   @Query("select transfer.fromSource.id, coalesce(sum(transfer.amount), 0) "
       + "from Transfer transfer where transfer.userAccount.id = :userId "
       + "group by transfer.fromSource.id")

@@ -1,9 +1,12 @@
 package com.example.taichinhcanhan.service;
 
 import com.example.taichinhcanhan.dto.MoneySourceRequest;
+import com.example.taichinhcanhan.dto.MoneySourceActivity;
 import com.example.taichinhcanhan.entity.MoneySource;
 import com.example.taichinhcanhan.entity.MoneySourceType;
 import com.example.taichinhcanhan.entity.TransactionType;
+import com.example.taichinhcanhan.entity.Transaction;
+import com.example.taichinhcanhan.entity.Transfer;
 import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
 import com.example.taichinhcanhan.repository.TransactionRepository;
@@ -15,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 @Service
 public class MoneySourceService {
@@ -56,6 +61,56 @@ public class MoneySourceService {
                     return moneySource;
           }
 
+          @Transactional(readOnly = true)
+          public List<MoneySourceActivity> activityHistory(Long sourceId, UserAccount userAccount) {
+                    moneySourceRepository.findByIdAndUserAccountId(sourceId, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nguồn tiền."));
+
+                    List<MoneySourceActivity> activities = new ArrayList<>();
+                    for (Transaction transaction : transactionRepository.findHistoryByUserAndSource(
+                                        userAccount.getId(), sourceId)) {
+                              boolean income = transaction.getType() == TransactionType.INCOME;
+                              String title = hasText(transaction.getDescription())
+                                                  ? transaction.getDescription()
+                                                  : transaction.getCategory().getName();
+                              activities.add(new MoneySourceActivity(
+                                                  transaction.getTransactionDate(),
+                                                  transaction.getCreatedAt(),
+                                                  transaction.getType().getDisplayName(),
+                                                  title,
+                                                  "Danh mục: " + transaction.getCategory().getName(),
+                                                  transaction.getAmount(),
+                                                  income));
+                    }
+                    for (Transfer transfer : transferRepository.findHistoryByUserAndSource(
+                                        userAccount.getId(), sourceId)) {
+                              boolean incoming = transfer.getToSource().getId().equals(sourceId);
+                              String otherSourceName = incoming
+                                                  ? transfer.getFromSource().getName()
+                                                  : transfer.getToSource().getName();
+                              String direction = incoming ? "Chuyển tiền đến" : "Chuyển tiền đi";
+                              String title = hasText(transfer.getDescription())
+                                                  ? transfer.getDescription()
+                                                  : direction + " · " + otherSourceName;
+                              String details = incoming
+                                                  ? "Từ nguồn: " + otherSourceName
+                                                  : "Đến nguồn: " + otherSourceName;
+                              activities.add(new MoneySourceActivity(
+                                                  transfer.getTransferDate(),
+                                                  transfer.getCreatedAt(),
+                                                  direction,
+                                                  title,
+                                                  details,
+                                                  transfer.getAmount(),
+                                                  incoming));
+                    }
+                    return activities.stream()
+                                        .sorted(Comparator.comparing(MoneySourceActivity::getDate)
+                                                            .thenComparing(MoneySourceActivity::getCreatedAt)
+                                                            .reversed())
+                                        .toList();
+          }
+
           @Transactional
           public MoneySource update(Long id, UserAccount userAccount, MoneySourceRequest request) {
                     MoneySource moneySource = moneySourceRepository.findOwnedByIdForUpdate(id, userAccount.getId())
@@ -66,7 +121,8 @@ public class MoneySourceService {
 
           @Transactional
           public void delete(Long id, UserAccount userAccount) {
-                    MoneySource moneySource = findOwnedById(id, userAccount);
+                    MoneySource moneySource = moneySourceRepository.findOwnedByIdForUpdate(id, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nguồn tiền."));
                     if (transactionRepository.existsByMoneySourceId(moneySource.getId())) {
                               throw new IllegalStateException("Không thể xóa nguồn tiền đã có giao dịch liên quan.");
                     }
@@ -128,5 +184,9 @@ public class MoneySourceService {
                               return null;
                     }
                     return description.trim();
+          }
+
+          private boolean hasText(String value) {
+                    return value != null && !value.isBlank();
           }
 }

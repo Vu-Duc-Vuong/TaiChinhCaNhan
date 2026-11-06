@@ -96,6 +96,19 @@ body {
           background: #EFF6FF;
 }
 
+.sidebar-link.active {
+          box-shadow: inset 3px 0 var(--primary);
+          font-weight: 600;
+}
+
+.sidebar-link:focus-visible,
+.sidebar-link:active {
+          color: var(--primary-dark);
+          background: #DBEAFE;
+          outline: 2px solid var(--primary);
+          outline-offset: 2px;
+}
+
 .sidebar-icon {
           width: 20px;
           color: currentColor;

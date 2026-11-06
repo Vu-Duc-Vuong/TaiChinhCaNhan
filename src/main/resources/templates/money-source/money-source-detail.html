@@ -23,14 +23,14 @@
                                         <div>
                                                   <dt>Số dư ban đầu</dt>
                                                   <dd class="amount-text"
-                                                            th:text="${#numbers.formatDecimal(moneySource.initialBalance, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(moneySource.initialBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Số dư hiện tại</dt>
                                                   <dd class="amount-text"
-                                                            th:text="${#numbers.formatDecimal(moneySource.currentBalance, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(moneySource.currentBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Mô tả</dt>
@@ -49,6 +49,46 @@
                                                             -</dd>
                                         </div>
                               </dl>
+                    </div>
+          </section>
+
+          <section class="statistics-panel">
+                    <div class="statistics-panel-heading">
+                              <h2>Nhật ký biến động số dư</h2>
+                    </div>
+                    <div class="empty-state compact-empty" th:if="${#lists.isEmpty(activities)}">
+                              <p class="text-secondary mb-0">Chưa có giao dịch hoặc chuyển tiền cho nguồn này.</p>
+                    </div>
+                    <div class="table-responsive" th:unless="${#lists.isEmpty(activities)}">
+                              <table class="table source-table align-middle mb-0">
+                                        <thead>
+                                                  <tr>
+                                                            <th>Ngày</th>
+                                                            <th>Diễn giải</th>
+                                                            <th>Loại</th>
+                                                            <th class="text-end">Biến động</th>
+                                                  </tr>
+                                        </thead>
+                                        <tbody>
+                                                  <tr th:each="activity : ${activities}">
+                                                            <td
+                                                                      th:text="${#temporals.format(activity.date, 'dd/MM/yyyy')}">
+                                                                      01/01/2026</td>
+                                                            <td>
+                                                                      <strong th:text="${activity.title}">Thu
+                                                                                nhập</strong>
+                                                                      <small class="d-block text-secondary"
+                                                                                th:text="${activity.details}">Danh
+                                                                                mục</small>
+                                                            </td>
+                                                            <td th:text="${activity.typeLabel}">Thu nhập</td>
+                                                            <td class="text-end amount-text"
+                                                                      th:classappend="${activity.increasesBalance ? ' statistics-income' : ' statistics-expense'}"
+                                                                      th:text="${(activity.increasesBalance ? '+ ' : '- ') + #numbers.formatDecimal(activity.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                      + 0 đ</td>
+                                                  </tr>
+                                        </tbody>
+                              </table>
                     </div>
           </section>
 </section>

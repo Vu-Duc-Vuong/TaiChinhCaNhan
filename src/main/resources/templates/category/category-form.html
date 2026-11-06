@@ -27,7 +27,8 @@
                                                   th:errorclass="is-invalid">
                                                   <option value="">Chọn loại danh mục</option>
                                                   <option th:each="categoryType : ${categoryTypes}"
-                                                            th:value="${categoryType}" th:text="${categoryType}">INCOME
+                                                            th:value="${categoryType}"
+                                                            th:text="${categoryType.displayName}">Thu nhập
                                                   </option>
                                         </select>
                                         <div class="invalid-feedback" th:errors="*{type}"></div>

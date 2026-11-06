@@ -38,20 +38,20 @@
                                         <div>
                                                   <dt>Hạn mức</dt>
                                                   <dd
-                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Đã chi</dt>
                                                   <dd
-                                                            th:text="${#numbers.formatDecimal(summary.spent, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(summary.spent, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Còn lại</dt>
                                                   <dd
-                                                            th:text="${#numbers.formatDecimal(summary.remaining, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(summary.remaining, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Thời gian</dt>

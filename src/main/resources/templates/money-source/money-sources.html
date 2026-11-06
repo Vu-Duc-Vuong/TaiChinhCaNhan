@@ -70,11 +70,11 @@
                                                                       </span>
                                                             </td>
                                                             <td class="text-end amount-text"
-                                                                      th:text="${#numbers.formatDecimal(source.initialBalance, 0, 'COMMA', 2, 'POINT')}">
-                                                                      0.00</td>
+                                                                      th:text="${#numbers.formatDecimal(source.initialBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                      0 đ</td>
                                                             <td class="text-end amount-text"
-                                                                      th:text="${#numbers.formatDecimal(source.currentBalance, 0, 'COMMA', 2, 'POINT')}">
-                                                                      0.00</td>
+                                                                      th:text="${#numbers.formatDecimal(source.currentBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                      0 đ</td>
                                                             <td class="description-cell"
                                                                       th:text="${source.description ?: '-'}">-</td>
                                                             <td

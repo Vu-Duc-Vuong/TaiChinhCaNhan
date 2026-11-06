@@ -83,8 +83,8 @@
                                                             <td th:text="${transfer.fromSource.name}">Tiền mặt</td>
                                                             <td th:text="${transfer.toSource.name}">Ngân hàng</td>
                                                             <td class="text-end amount-text"
-                                                                      th:text="${#numbers.formatDecimal(transfer.amount, 0, 'COMMA', 2, 'POINT')}">
-                                                                      0.00</td>
+                                                                      th:text="${#numbers.formatDecimal(transfer.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                      0 đ</td>
                                                             <td class="description-cell"
                                                                       th:text="${transfer.description ?: '-'}">-</td>
                                                             <td>

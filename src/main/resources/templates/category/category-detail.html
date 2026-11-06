@@ -20,17 +20,11 @@
                               <h2 th:text="${category.name}">Lương</h2>
                               <span class="source-type-badge"
                                         th:classappend="' category-' + ${category.type.name().toLowerCase()}"
-                                        th:text="${category.type}">INCOME</span>
+                                        th:text="${category.type.displayName}">Thu nhập</span>
                               <dl class="detail-list">
                                         <div>
                                                   <dt>Mô tả</dt>
                                                   <dd th:text="${category.description ?: '-'}">-</dd>
-                                        </div>
-                                        <div>
-                                                  <dt>Ngày tạo</dt>
-                                                  <dd
-                                                            th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm')}">
-                                                            -</dd>
                                         </div>
                               </dl>
                     </div>

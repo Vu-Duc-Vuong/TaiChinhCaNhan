@@ -20,14 +20,14 @@
                               <h2 th:text="${transaction.description ?: 'Giao dịch'}">Giao dịch</h2>
                               <span class="transaction-type-badge"
                                         th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income' : ' transaction-expense'}"
-                                        th:text="${transaction.type}">INCOME</span>
+                                        th:text="${transaction.type.displayName}">Thu nhập</span>
                               <dl class="detail-list">
                                         <div>
                                                   <dt>Số tiền</dt>
                                                   <dd class="transaction-amount"
                                                             th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income-text' : ' transaction-expense-text'}"
-                                                            th:text="${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 2, 'POINT')}">
-                                                            0.00</dd>
+                                                            th:text="${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                            0 đ</dd>
                                         </div>
                                         <div>
                                                   <dt>Danh mục</dt>

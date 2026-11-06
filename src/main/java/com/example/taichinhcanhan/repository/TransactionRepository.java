@@ -24,6 +24,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
       + "order by transaction.transactionDate desc, transaction.id desc")
   List<Transaction> findRecentByUserId(@Param("userId") Long userId, Pageable pageable);
 
+  @Query("select transaction from Transaction transaction join fetch transaction.category "
+      + "where transaction.userAccount.id = :userId and transaction.moneySource.id = :sourceId "
+      + "order by transaction.transactionDate desc, transaction.createdAt desc, transaction.id desc")
+  List<Transaction> findHistoryByUserAndSource(
+      @Param("userId") Long userId,
+      @Param("sourceId") Long sourceId);
+
   List<Transaction> findByUserAccountIdAndTypeOrderByTransactionDateDesc(
       Long userId,
       TransactionType type);

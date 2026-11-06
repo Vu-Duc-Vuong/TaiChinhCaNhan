@@ -80,6 +80,7 @@ public class MoneySourceController {
                               model.addAttribute("pageTitle", "Chi tiết nguồn tiền");
                               model.addAttribute("currentUserName", userAccount.getUsername());
                               model.addAttribute("moneySource", moneySource);
+                              model.addAttribute("activities", moneySourceService.activityHistory(id, userAccount));
                               return "money-source/money-source-detail";
                     } catch (IllegalArgumentException exception) {
                               redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy nguồn tiền.");

@@ -1,31 +1,43 @@
 <aside class="sidebar" th:fragment="sidebar" xmlns:th="http://www.thymeleaf.org">
           <div class="sidebar-heading">MENU</div>
           <nav class="sidebar-nav">
-                    <a class="sidebar-link active" th:href="@{/dashboard}">
+                    <a class="sidebar-link" th:classappend="${pageTitle == 'Tổng quan'} ? 'active' : ''"
+                              th:href="@{/dashboard}">
                               <span class="sidebar-icon">⌂</span>
                               <span>Tổng quan</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/money-sources}">
+                    <a class="sidebar-link"
+                              th:classappend="${pageTitle == 'Nguồn tiền' or pageTitle == 'Thêm nguồn tiền' or pageTitle == 'Chỉnh sửa nguồn tiền' or pageTitle == 'Chi tiết nguồn tiền'} ? 'active' : ''"
+                              th:href="@{/money-sources}">
                               <span class="sidebar-icon">▣</span>
                               <span>Nguồn tiền</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/transactions}">
+                    <a class="sidebar-link"
+                              th:classappend="${pageTitle == 'Giao dịch' or pageTitle == 'Thêm giao dịch' or pageTitle == 'Chỉnh sửa giao dịch' or pageTitle == 'Chi tiết giao dịch'} ? 'active' : ''"
+                              th:href="@{/transactions}">
                               <span class="sidebar-icon">◈</span>
                               <span>Giao dịch</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/transfers}">
+                    <a class="sidebar-link"
+                              th:classappend="${pageTitle == 'Chuyển tiền' or pageTitle == 'Tạo chuyển tiền' or pageTitle == 'Chỉnh sửa chuyển tiền' or pageTitle == 'Chi tiết chuyển tiền'} ? 'active' : ''"
+                              th:href="@{/transfers}">
                               <span class="sidebar-icon">↔</span>
                               <span>Chuyển tiền</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/categories}">
+                    <a class="sidebar-link"
+                              th:classappend="${pageTitle == 'Danh mục' or pageTitle == 'Thêm danh mục' or pageTitle == 'Chỉnh sửa danh mục' or pageTitle == 'Chi tiết danh mục'} ? 'active' : ''"
+                              th:href="@{/categories}">
                               <span class="sidebar-icon">☷</span>
                               <span>Danh mục</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/budgets}">
+                    <a class="sidebar-link"
+                              th:classappend="${pageTitle == 'Ngân sách' or pageTitle == 'Thêm ngân sách' or pageTitle == 'Chỉnh sửa ngân sách' or pageTitle == 'Chi tiết ngân sách'} ? 'active' : ''"
+                              th:href="@{/budgets}">
                               <span class="sidebar-icon">▤</span>
                               <span>Ngân sách</span>
                     </a>
-                    <a class="sidebar-link" th:href="@{/statistics}">
+                    <a class="sidebar-link" th:classappend="${pageTitle == 'Thống kê và báo cáo'} ? 'active' : ''"
+                              th:href="@{/statistics}">
                               <span class="sidebar-icon">▥</span>
                               <span>Báo cáo</span>
                     </a>

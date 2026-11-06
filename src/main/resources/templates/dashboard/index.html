@@ -14,28 +14,28 @@
                     <article class="statistics-card">
                               <span>Tổng tài sản</span>
                               <strong
-                                        th:text="${#numbers.formatDecimal(dashboard.totalAssets, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        th:text="${#numbers.formatDecimal(dashboard.totalAssets, 1, 'POINT', 0, 'POINT') + ' đ'}">0
                                         đ</strong>
                               <small>Tổng số dư hiện tại của các nguồn tiền</small>
                     </article>
                     <article class="statistics-card">
                               <span>Thu nhập</span>
                               <strong class="statistics-income"
-                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.income, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.income, 1, 'POINT', 0, 'POINT') + ' đ'}">0
                                         đ</strong>
                               <small>Trong tháng này</small>
                     </article>
                     <article class="statistics-card">
                               <span>Chi tiêu</span>
                               <strong class="statistics-expense"
-                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.expense, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.expense, 1, 'POINT', 0, 'POINT') + ' đ'}">0
                                         đ</strong>
                               <small>Trong tháng này</small>
                     </article>
                     <article class="statistics-card">
                               <span>Chênh lệch thu chi</span>
                               <strong th:classappend="${dashboard.monthlySummary.difference.signum() >= 0 ? ' statistics-income' : ' statistics-expense'}"
-                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.difference, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.difference, 1, 'POINT', 0, 'POINT') + ' đ'}">0
                                         đ</strong>
                               <small>Thu nhập trừ chi tiêu trong tháng</small>
                     </article>
@@ -71,11 +71,11 @@
                                                                       <td th:text="${source.type.displayName}">Tiền mặt
                                                                       </td>
                                                                       <td class="text-end"
-                                                                                th:text="${#numbers.formatDecimal(source.initialBalance, 1, 'COMMA', 2, 'POINT') + ' đ'}">
-                                                                                0.00 đ</td>
+                                                                                th:text="${#numbers.formatDecimal(source.initialBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                                0 đ</td>
                                                                       <td class="text-end amount-text"
-                                                                                th:text="${#numbers.formatDecimal(source.currentBalance, 1, 'COMMA', 2, 'POINT') + ' đ'}">
-                                                                                0.00 đ</td>
+                                                                                th:text="${#numbers.formatDecimal(source.currentBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                                0 đ</td>
                                                             </tr>
                                                   </tbody>
                                         </table>
@@ -123,8 +123,8 @@
                                                                                 Thu nhập</td>
                                                                       <td class="text-end"
                                                                                 th:classappend="${transaction.type.name() == 'INCOME' ? ' statistics-income' : ' statistics-expense'}"
-                                                                                th:text="${(transaction.type.name() == 'INCOME' ? '+ ' : '- ') + #numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT') + ' đ'}">
-                                                                                0.00 đ</td>
+                                                                                th:text="${(transaction.type.name() == 'INCOME' ? '+ ' : '- ') + #numbers.formatDecimal(transaction.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                                0 đ</td>
                                                             </tr>
                                                   </tbody>
                                         </table>

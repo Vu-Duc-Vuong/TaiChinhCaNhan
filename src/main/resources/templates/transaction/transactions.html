@@ -24,7 +24,7 @@
                                                   <option th:each="transactionType : ${transactionTypes}"
                                                             th:value="${transactionType}"
                                                             th:selected="${selectedType == transactionType}"
-                                                            th:text="${transactionType}">INCOME</option>
+                                                            th:text="${transactionType.displayName}">Thu nhập</option>
                                         </select>
                               </div>
                               <div class="col-lg-3 col-md-6">
@@ -42,8 +42,8 @@
                                                   <option value="">Tất cả danh mục</option>
                                                   <option th:each="category : ${categories}" th:value="${category.id}"
                                                             th:selected="${selectedCategoryId == category.id}"
-                                                            th:text="${category.name + ' (' + category.type + ')'}">
-                                                            Lương (INCOME)</option>
+                                                            th:text="${category.name + ' (' + category.type.displayName + ')'}">
+                                                            Lương (Thu nhập)</option>
                                         </select>
                               </div>
                               <div class="col-lg-3 col-md-6">
@@ -94,12 +94,13 @@
                                                             <td>
                                                                       <span class="transaction-type-badge"
                                                                                 th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income' : ' transaction-expense'}"
-                                                                                th:text="${transaction.type}">INCOME</span>
+                                                                                th:text="${transaction.type.displayName}">Thu
+                                                                                nhập</span>
                                                             </td>
                                                             <td class="text-end transaction-amount"
                                                                       th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income-text' : ' transaction-expense-text'}"
-                                                                      th:text="${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 2, 'POINT')}">
-                                                                      0.00</td>
+                                                                      th:text="${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
+                                                                      0 đ</td>
                                                             <td th:text="${transaction.category.name}">Lương</td>
                                                             <td th:text="${transaction.moneySource.name}">Tiền mặt</td>
                                                             <td class="description-cell"

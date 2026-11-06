@@ -84,13 +84,16 @@
                               </div>
                               <div class="budget-figures">
                                         <div><span>Hạn mức</span><strong
-                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">0
+                                                            đ</strong>
                                         </div>
                                         <div><span>Đã chi</span><strong
-                                                            th:text="${#numbers.formatDecimal(summary.spent, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                            th:text="${#numbers.formatDecimal(summary.spent, 1, 'POINT', 0, 'POINT') + ' đ'}">0
+                                                            đ</strong>
                                         </div>
                                         <div><span>Còn lại</span><strong
-                                                            th:text="${#numbers.formatDecimal(summary.remaining, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                            th:text="${#numbers.formatDecimal(summary.remaining, 1, 'POINT', 0, 'POINT') + ' đ'}">0
+                                                            đ</strong>
                                         </div>
                               </div>
                               <div class="budget-card-footer">
