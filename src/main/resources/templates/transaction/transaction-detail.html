@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">THU CHI</p>
+                              <h1>Chi tiết giao dịch</h1>
+                              <p class="text-secondary mb-0">Thông tin thuộc tài khoản hiện tại.</p>
+                    </div>
+                    <div class="heading-actions">
+                              <a class="btn btn-outline-primary"
+                                        th:href="@{/transactions/{id}/edit(id=${transaction.id})}">Chỉnh sửa</a>
+                              <a class="btn btn-secondary" th:href="@{/transactions}">Quay lại</a>
+                    </div>
+          </div>
+
+          <section class="detail-panel">
+                    <div class="detail-icon">◈</div>
+                    <div class="detail-content">
+                              <h2 th:text="${transaction.description ?: 'Giao dịch'}">Giao dịch</h2>
+                              <span class="transaction-type-badge"
+                                        th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income' : ' transaction-expense'}"
+                                        th:text="${transaction.type}">INCOME</span>
+                              <dl class="detail-list">
+                                        <div>
+                                                  <dt>Số tiền</dt>
+                                                  <dd class="transaction-amount"
+                                                            th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income-text' : ' transaction-expense-text'}"
+                                                            th:text="${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Danh mục</dt>
+                                                  <dd th:text="${transaction.category.name}">Lương</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Nguồn tiền</dt>
+                                                  <dd th:text="${transaction.moneySource.name}">Tiền mặt</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày giao dịch</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}">
+                                                            -</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày tạo</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(transaction.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                              </dl>
+                    </div>
+          </section>
+</section>
+
+</html>

@@ -418,6 +418,39 @@ h2 {
           background: #FEF2F2;
 }
 
+.transaction-type-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 5px 9px;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          white-space: nowrap;
+}
+
+.transaction-income {
+          color: #166534;
+          background: #F0FDF4;
+}
+
+.transaction-expense {
+          color: #B91C1C;
+          background: #FEF2F2;
+}
+
+.transaction-amount {
+          font-weight: 700;
+          white-space: nowrap;
+}
+
+.transaction-income-text {
+          color: #15803D;
+}
+
+.transaction-expense-text {
+          color: #DC2626;
+}
+
 .amount-text {
           color: var(--primary-dark);
           font-weight: 700;

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">THU CHI</p>
+                              <h1>Giao dịch</h1>
+                              <p class="text-secondary mb-0">Theo dõi các khoản thu nhập và chi tiêu của bạn.</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/transactions/new}">Thêm giao dịch</a>
+          </div>
+
+          <section class="filter-panel">
+                    <form class="row g-3 align-items-end" th:action="@{/transactions}" method="get">
+                              <div class="col-lg-4 col-md-6">
+                                        <label class="form-label" for="keyword">Tìm theo mô tả</label>
+                                        <input class="form-control" id="keyword" name="keyword" type="search"
+                                                  th:value="${keyword}" placeholder="Ví dụ: tiền điện">
+                              </div>
+                              <div class="col-lg-2 col-md-6">
+                                        <label class="form-label" for="type">Loại</label>
+                                        <select class="form-select" id="type" name="type">
+                                                  <option value="">Tất cả</option>
+                                                  <option th:each="transactionType : ${transactionTypes}"
+                                                            th:value="${transactionType}"
+                                                            th:selected="${selectedType == transactionType}"
+                                                            th:text="${transactionType}">INCOME</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="moneySourceId">Nguồn tiền</label>
+                                        <select class="form-select" id="moneySourceId" name="moneySourceId">
+                                                  <option value="">Tất cả nguồn tiền</option>
+                                                  <option th:each="source : ${moneySources}" th:value="${source.id}"
+                                                            th:selected="${selectedMoneySourceId == source.id}"
+                                                            th:text="${source.name}">Tiền mặt</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="categoryId">Danh mục</label>
+                                        <select class="form-select" id="categoryId" name="categoryId">
+                                                  <option value="">Tất cả danh mục</option>
+                                                  <option th:each="category : ${categories}" th:value="${category.id}"
+                                                            th:selected="${selectedCategoryId == category.id}"
+                                                            th:text="${category.name + ' (' + category.type + ')'}">
+                                                            Lương (INCOME)</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="startDate">Từ ngày</label>
+                                        <input class="form-control" id="startDate" name="startDate" type="date"
+                                                  th:value="${startDate}">
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="endDate">Đến ngày</label>
+                                        <input class="form-control" id="endDate" name="endDate" type="date"
+                                                  th:value="${endDate}">
+                              </div>
+                              <div class="col-lg-3 col-md-6 d-grid">
+                                        <button class="btn btn-outline-primary" type="submit">Lọc giao dịch</button>
+                              </div>
+                              <div class="col-lg-3 col-md-6 d-grid">
+                                        <a class="btn btn-outline-secondary" th:href="@{/transactions}">Xóa bộ lọc</a>
+                              </div>
+                    </form>
+          </section>
+
+          <section class="data-panel">
+                    <div class="empty-state" th:if="${#lists.isEmpty(transactions)}">
+                              <div class="empty-state-icon">◈</div>
+                              <h2>Chưa có giao dịch</h2>
+                              <p class="text-secondary">Hãy thêm giao dịch đầu tiên để bắt đầu theo dõi.</p>
+                              <a class="btn btn-primary" th:href="@{/transactions/new}">Thêm giao dịch</a>
+                    </div>
+
+                    <div class="table-responsive" th:unless="${#lists.isEmpty(transactions)}">
+                              <table class="table source-table align-middle mb-0">
+                                        <thead>
+                                                  <tr>
+                                                            <th>Ngày</th>
+                                                            <th>Loại</th>
+                                                            <th class="text-end">Số tiền</th>
+                                                            <th>Danh mục</th>
+                                                            <th>Nguồn tiền</th>
+                                                            <th>Mô tả</th>
+                                                            <th class="text-end">Thao tác</th>
+                                                  </tr>
+                                        </thead>
+                                        <tbody>
+                                                  <tr th:each="transaction : ${transactions}">
+                                                            <td
+                                                                      th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}">
+                                                                      -</td>
+                                                            <td>
+                                                                      <span class="transaction-type-badge"
+                                                                                th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income' : ' transaction-expense'}"
+                                                                                th:text="${transaction.type}">INCOME</span>
+                                                            </td>
+                                                            <td class="text-end transaction-amount"
+                                                                      th:classappend="${transaction.type.name() == 'INCOME' ? ' transaction-income-text' : ' transaction-expense-text'}"
+                                                                      th:text="${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td th:text="${transaction.category.name}">Lương</td>
+                                                            <td th:text="${transaction.moneySource.name}">Tiền mặt</td>
+                                                            <td class="description-cell"
+                                                                      th:text="${transaction.description ?: '-'}">-</td>
+                                                            <td>
+                                                                      <div class="table-actions justify-content-end">
+                                                                                <a class="btn btn-sm btn-outline-secondary"
+                                                                                          th:href="@{/transactions/{id}(id=${transaction.id})}">Xem</a>
+                                                                                <a class="btn btn-sm btn-outline-primary"
+                                                                                          th:href="@{/transactions/{id}/edit(id=${transaction.id})}">Sửa</a>
+                                                                                <form th:action="@{/transactions/{id}/delete(id=${transaction.id})}"
+                                                                                          method="post"
+                                                                                          onsubmit="return confirm('Bạn có chắc muốn xóa giao dịch này không?');">
+                                                                                          <input type="hidden"
+                                                                                                    th:name="${_csrf.parameterName}"
+                                                                                                    th:value="${_csrf.token}">
+                                                                                          <button class="btn btn-sm btn-outline-danger"
+                                                                                                    type="submit">Xóa</button>
+                                                                                </form>
+                                                                      </div>
+                                                            </td>
+                                                  </tr>
+                                        </tbody>
+                              </table>
+                    </div>
+          </section>
+</section>
+
+</html>
