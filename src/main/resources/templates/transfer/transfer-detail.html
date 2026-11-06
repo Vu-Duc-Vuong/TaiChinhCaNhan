@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">ĐIỀU CHUYỂN</p>
+                              <h1>Chi tiết chuyển tiền</h1>
+                              <p class="text-secondary mb-0">Thông tin thuộc tài khoản hiện tại.</p>
+                    </div>
+                    <div class="heading-actions">
+                              <a class="btn btn-outline-primary"
+                                        th:href="@{/transfers/{id}/edit(id=${transfer.id})}">Chỉnh sửa</a>
+                              <a class="btn btn-secondary" th:href="@{/transfers}">Quay lại</a>
+                    </div>
+          </div>
+
+          <section class="detail-panel">
+                    <div class="detail-icon">↔</div>
+                    <div class="detail-content">
+                              <h2 th:text="${transfer.description ?: 'Chuyển tiền'}">Chuyển tiền</h2>
+                              <dl class="detail-list">
+                                        <div>
+                                                  <dt>Nguồn chuyển đi</dt>
+                                                  <dd th:text="${transfer.fromSource.name}">Tiền mặt</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Nguồn nhận</dt>
+                                                  <dd th:text="${transfer.toSource.name}">Ngân hàng</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Số tiền</dt>
+                                                  <dd class="amount-text"
+                                                            th:text="${#numbers.formatDecimal(transfer.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày chuyển tiền</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(transfer.transferDate, 'dd/MM/yyyy')}">
+                                                            -</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày tạo</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(transfer.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày cập nhật</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(transfer.updatedAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                              </dl>
+                    </div>
+          </section>
+</section>
+
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">KẾ HOẠCH CHI TIÊU</p>
+                              <h1>Ngân sách</h1>
+                              <p class="text-secondary mb-0">Đặt giới hạn và theo dõi mức sử dụng ngân sách.</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/budgets/new}">Thêm ngân sách</a>
+          </div>
+
+          <section class="filter-panel">
+                    <form class="row g-3 align-items-end" th:action="@{/budgets}" method="get">
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="keyword">Tìm theo tên</label>
+                                        <input class="form-control" id="keyword" name="keyword" type="search"
+                                                  th:value="${keyword}" placeholder="Ví dụ: Ăn uống">
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="categoryId">Danh mục</label>
+                                        <select class="form-select" id="categoryId" name="categoryId">
+                                                  <option value="">Tất cả danh mục</option>
+                                                  <option th:each="category : ${categories}" th:value="${category.id}"
+                                                            th:selected="${selectedCategoryId == category.id}"
+                                                            th:text="${category.name}">Ăn uống</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-2 col-md-6">
+                                        <label class="form-label" for="overall">Phạm vi</label>
+                                        <select class="form-select" id="overall" name="overall">
+                                                  <option value="">Tất cả</option>
+                                                  <option value="true" th:selected="${selectedOverall == true}">Ngân
+                                                            sách tổng</option>
+                                                  <option value="false" th:selected="${selectedOverall == false}">Theo
+                                                            danh mục</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-2 col-md-6">
+                                        <label class="form-label" for="status">Trạng thái</label>
+                                        <select class="form-select" id="status" name="status">
+                                                  <option value="">Tất cả</option>
+                                                  <option value="NORMAL" th:selected="${selectedStatus == 'NORMAL'}">
+                                                            Bình thường</option>
+                                                  <option value="WARNING" th:selected="${selectedStatus == 'WARNING'}">
+                                                            Sắp hết</option>
+                                                  <option value="EXCEEDED"
+                                                            th:selected="${selectedStatus == 'EXCEEDED'}">Đã vượt
+                                                  </option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-2 col-md-6 d-grid">
+                                        <button class="btn btn-outline-primary" type="submit">Lọc</button>
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="startDate">Từ ngày</label>
+                                        <input class="form-control" id="startDate" name="startDate" type="date"
+                                                  th:value="${startDate}">
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="endDate">Đến ngày</label>
+                                        <input class="form-control" id="endDate" name="endDate" type="date"
+                                                  th:value="${endDate}">
+                              </div>
+                              <div class="col-lg-2 col-md-6 d-grid">
+                                        <a class="btn btn-outline-secondary" th:href="@{/budgets}">Xóa bộ lọc</a>
+                              </div>
+                    </form>
+          </section>
+
+          <section class="budget-grid" th:if="${not #lists.isEmpty(summaries)}">
+                    <article class="budget-card" th:each="summary : ${summaries}"
+                              th:classappend="' budget-' + ${summary.status.toLowerCase()}">
+                              <div class="budget-card-heading">
+                                        <div>
+                                                  <p class="budget-scope"
+                                                            th:text="${summary.budget.category == null ? 'Ngân sách tổng' : summary.budget.category.name}">
+                                                            Ngân sách tổng</p>
+                                                  <h2 th:text="${summary.budget.name ?: 'Ngân sách không tên'}">Ngân
+                                                            sách</h2>
+                                        </div>
+                                        <span class="budget-status"
+                                                  th:text="${summary.status == 'NORMAL' ? 'Bình thường' : (summary.status == 'WARNING' ? 'Sắp hết' : 'Đã vượt')}">Bình
+                                                  thường</span>
+                              </div>
+                              <div class="budget-progress-label">
+                                        <span>Đã sử dụng</span>
+                                        <strong th:text="${summary.usedPercent + '%'}">0%</strong>
+                              </div>
+                              <div class="progress budget-progress" role="progressbar">
+                                        <div class="progress-bar"
+                                                  th:style="'width: ' + (${summary.usedPercent > 100 ? 100 : summary.usedPercent}) + '%'">
+                                        </div>
+                              </div>
+                              <div class="budget-figures">
+                                        <div><span>Hạn mức</span><strong
+                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                        </div>
+                                        <div><span>Đã chi</span><strong
+                                                            th:text="${#numbers.formatDecimal(summary.spent, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                        </div>
+                                        <div><span>Còn lại</span><strong
+                                                            th:text="${#numbers.formatDecimal(summary.remaining, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                        </div>
+                              </div>
+                              <div class="budget-card-footer">
+                                        <span
+                                                  th:text="${#temporals.format(summary.budget.startDate, 'dd/MM/yyyy') + ' - ' + #temporals.format(summary.budget.endDate, 'dd/MM/yyyy')}">01/11/2026
+                                                  - 30/11/2026</span>
+                                        <div class="table-actions">
+                                                  <a class="btn btn-sm btn-outline-secondary"
+                                                            th:href="@{/budgets/{id}(id=${summary.budget.id})}">Xem</a>
+                                                  <a class="btn btn-sm btn-outline-primary"
+                                                            th:href="@{/budgets/{id}/edit(id=${summary.budget.id})}">Sửa</a>
+                                                  <form th:action="@{/budgets/{id}/delete(id=${summary.budget.id})}"
+                                                            method="post"
+                                                            onsubmit="return confirm('Bạn có chắc muốn xóa ngân sách này không?');">
+                                                            <input type="hidden" th:name="${_csrf.parameterName}"
+                                                                      th:value="${_csrf.token}">
+                                                            <button class="btn btn-sm btn-outline-danger"
+                                                                      type="submit">Xóa</button>
+                                                  </form>
+                                        </div>
+                              </div>
+                    </article>
+          </section>
+
+          <section class="data-panel" th:if="${#lists.isEmpty(summaries)}">
+                    <div class="empty-state">
+                              <div class="empty-state-icon">▤</div>
+                              <h2>Chưa có ngân sách</h2>
+                              <p class="text-secondary">Hãy tạo ngân sách đầu tiên để theo dõi chi tiêu.</p>
+                              <a class="btn btn-primary" th:href="@{/budgets/new}">Thêm ngân sách</a>
+                    </div>
+          </section>
+</section>
+
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">KẾ HOẠCH CHI TIÊU</p>
+                              <h1>Chi tiết ngân sách</h1>
+                              <p class="text-secondary mb-0">Các số liệu chi tiêu được tính trực tiếp từ giao dịch.</p>
+                    </div>
+                    <div class="heading-actions">
+                              <a class="btn btn-outline-primary"
+                                        th:href="@{/budgets/{id}/edit(id=${summary.budget.id})}">Chỉnh sửa</a>
+                              <a class="btn btn-secondary" th:href="@{/budgets}">Quay lại</a>
+                    </div>
+          </div>
+
+          <section class="detail-panel budget-detail-panel"
+                    th:classappend="' budget-' + ${summary.status.toLowerCase()}">
+                    <div class="detail-icon">▤</div>
+                    <div class="detail-content">
+                              <p class="budget-scope"
+                                        th:text="${summary.budget.category == null ? 'Ngân sách tổng' : summary.budget.category.name}">
+                                        Ngân sách tổng</p>
+                              <h2 th:text="${summary.budget.name ?: 'Ngân sách không tên'}">Ngân sách</h2>
+                              <span class="budget-status"
+                                        th:text="${summary.status == 'NORMAL' ? 'Bình thường' : (summary.status == 'WARNING' ? 'Sắp hết' : 'Đã vượt')}">Bình
+                                        thường</span>
+                              <div class="budget-progress-label detail-progress-label">
+                                        <span>Đã sử dụng</span>
+                                        <strong th:text="${summary.usedPercent + '%'}">0%</strong>
+                              </div>
+                              <div class="progress budget-progress" role="progressbar">
+                                        <div class="progress-bar"
+                                                  th:style="'width: ' + (${summary.usedPercent > 100 ? 100 : summary.usedPercent}) + '%'">
+                                        </div>
+                              </div>
+                              <dl class="detail-list">
+                                        <div>
+                                                  <dt>Hạn mức</dt>
+                                                  <dd
+                                                            th:text="${#numbers.formatDecimal(summary.budget.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Đã chi</dt>
+                                                  <dd
+                                                            th:text="${#numbers.formatDecimal(summary.spent, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Còn lại</dt>
+                                                  <dd
+                                                            th:text="${#numbers.formatDecimal(summary.remaining, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Thời gian</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(summary.budget.startDate, 'dd/MM/yyyy') + ' - ' + #temporals.format(summary.budget.endDate, 'dd/MM/yyyy')}">
+                                                            -</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Mô tả</dt>
+                                                  <dd th:text="${summary.budget.description ?: '-'}">-</dd>
+                                        </div>
+                              </dl>
+                    </div>
+          </section>
+</section>
+
+</html>

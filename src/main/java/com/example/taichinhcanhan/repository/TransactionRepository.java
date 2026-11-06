@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,4 +49,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
           boolean existsByCategoryId(Long categoryId);
 
           Optional<Transaction> findByIdAndUserAccountId(Long id, Long userId);
+
+          @Query("""
+                              select coalesce(sum(transaction.amount), 0)
+                              from Transaction transaction
+                              where transaction.userAccount.id = :userId
+                                and transaction.type = com.example.taichinhcanhan.entity.TransactionType.EXPENSE
+                                and transaction.transactionDate between :startDate and :endDate
+                                and (:categoryId is null or transaction.category.id = :categoryId)
+                              """)
+          BigDecimal sumExpenseForBudget(
+                              @Param("userId") Long userId,
+                              @Param("categoryId") Long categoryId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
 }

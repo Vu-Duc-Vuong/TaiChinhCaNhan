@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">ĐIỀU CHUYỂN</p>
+                              <h1>Chuyển tiền</h1>
+                              <p class="text-secondary mb-0">Theo dõi lịch sử chuyển tiền giữa các nguồn của bạn.</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/transfers/new}">Tạo chuyển tiền</a>
+          </div>
+
+          <section class="filter-panel">
+                    <form class="row g-3 align-items-end" th:action="@{/transfers}" method="get">
+                              <div class="col-lg-4 col-md-6">
+                                        <label class="form-label" for="keyword">Tìm theo mô tả</label>
+                                        <input class="form-control" id="keyword" name="keyword" type="search"
+                                                  th:value="${keyword}" placeholder="Ví dụ: chuyển khoản">
+                              </div>
+                              <div class="col-lg-4 col-md-6">
+                                        <label class="form-label" for="fromSourceId">Nguồn chuyển đi</label>
+                                        <select class="form-select" id="fromSourceId" name="fromSourceId">
+                                                  <option value="">Tất cả nguồn chuyển đi</option>
+                                                  <option th:each="source : ${moneySources}" th:value="${source.id}"
+                                                            th:selected="${selectedFromSourceId == source.id}"
+                                                            th:text="${source.name}">Tiền mặt</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-4 col-md-6">
+                                        <label class="form-label" for="toSourceId">Nguồn nhận</label>
+                                        <select class="form-select" id="toSourceId" name="toSourceId">
+                                                  <option value="">Tất cả nguồn nhận</option>
+                                                  <option th:each="source : ${moneySources}" th:value="${source.id}"
+                                                            th:selected="${selectedToSourceId == source.id}"
+                                                            th:text="${source.name}">Tài khoản ngân hàng</option>
+                                        </select>
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="startDate">Từ ngày</label>
+                                        <input class="form-control" id="startDate" name="startDate" type="date"
+                                                  th:value="${startDate}">
+                              </div>
+                              <div class="col-lg-3 col-md-6">
+                                        <label class="form-label" for="endDate">Đến ngày</label>
+                                        <input class="form-control" id="endDate" name="endDate" type="date"
+                                                  th:value="${endDate}">
+                              </div>
+                              <div class="col-lg-3 col-md-6 d-grid">
+                                        <button class="btn btn-outline-primary" type="submit">Lọc chuyển tiền</button>
+                              </div>
+                              <div class="col-lg-3 col-md-6 d-grid">
+                                        <a class="btn btn-outline-secondary" th:href="@{/transfers}">Xóa bộ lọc</a>
+                              </div>
+                    </form>
+          </section>
+
+          <section class="data-panel">
+                    <div class="empty-state" th:if="${#lists.isEmpty(transfers)}">
+                              <div class="empty-state-icon">↔</div>
+                              <h2>Chưa có giao dịch chuyển tiền</h2>
+                              <p class="text-secondary">Hãy tạo giao dịch chuyển tiền đầu tiên giữa các nguồn của bạn.
+                              </p>
+                              <a class="btn btn-primary" th:href="@{/transfers/new}">Tạo chuyển tiền</a>
+                    </div>
+
+                    <div class="table-responsive" th:unless="${#lists.isEmpty(transfers)}">
+                              <table class="table source-table align-middle mb-0">
+                                        <thead>
+                                                  <tr>
+                                                            <th>Ngày chuyển</th>
+                                                            <th>Chuyển đi</th>
+                                                            <th>Nhận</th>
+                                                            <th class="text-end">Số tiền</th>
+                                                            <th>Mô tả</th>
+                                                            <th class="text-end">Thao tác</th>
+                                                  </tr>
+                                        </thead>
+                                        <tbody>
+                                                  <tr th:each="transfer : ${transfers}">
+                                                            <td
+                                                                      th:text="${#temporals.format(transfer.transferDate, 'dd/MM/yyyy')}">
+                                                                      -</td>
+                                                            <td th:text="${transfer.fromSource.name}">Tiền mặt</td>
+                                                            <td th:text="${transfer.toSource.name}">Ngân hàng</td>
+                                                            <td class="text-end amount-text"
+                                                                      th:text="${#numbers.formatDecimal(transfer.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td class="description-cell"
+                                                                      th:text="${transfer.description ?: '-'}">-</td>
+                                                            <td>
+                                                                      <div class="table-actions justify-content-end">
+                                                                                <a class="btn btn-sm btn-outline-secondary"
+                                                                                          th:href="@{/transfers/{id}(id=${transfer.id})}">Xem</a>
+                                                                                <a class="btn btn-sm btn-outline-primary"
+                                                                                          th:href="@{/transfers/{id}/edit(id=${transfer.id})}">Sửa</a>
+                                                                                <form th:action="@{/transfers/{id}/delete(id=${transfer.id})}"
+                                                                                          method="post"
+                                                                                          onsubmit="return confirm('Bạn có chắc muốn xóa giao dịch chuyển tiền này không?');">
+                                                                                          <input type="hidden"
+                                                                                                    th:name="${_csrf.parameterName}"
+                                                                                                    th:value="${_csrf.token}">
+                                                                                          <button class="btn btn-sm btn-outline-danger"
+                                                                                                    type="submit">Xóa</button>
+                                                                                </form>
+                                                                      </div>
+                                                            </td>
+                                                  </tr>
+                                        </tbody>
+                              </table>
+                    </div>
+          </section>
+</section>
+
+</html>
