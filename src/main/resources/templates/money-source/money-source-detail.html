@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">NGUỒN TIỀN</p>
+                              <h1>Chi tiết nguồn tiền</h1>
+                              <p class="text-secondary mb-0">Thông tin thuộc tài khoản hiện tại.</p>
+                    </div>
+                    <div class="heading-actions">
+                              <a class="btn btn-outline-primary"
+                                        th:href="@{/money-sources/{id}/edit(id=${moneySource.id})}">Chỉnh sửa</a>
+                              <a class="btn btn-secondary" th:href="@{/money-sources}">Quay lại</a>
+                    </div>
+          </div>
+
+          <section class="detail-panel">
+                    <div class="detail-icon">▣</div>
+                    <div class="detail-content">
+                              <h2 th:text="${moneySource.name}">Tiền mặt</h2>
+                              <span class="source-type-badge" th:text="${moneySource.type}">CASH</span>
+                              <dl class="detail-list">
+                                        <div>
+                                                  <dt>Số dư ban đầu</dt>
+                                                  <dd class="amount-text"
+                                                            th:text="${#numbers.formatDecimal(moneySource.initialBalance, 0, 'COMMA', 2, 'POINT')}">
+                                                            0.00</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Mô tả</dt>
+                                                  <dd th:text="${moneySource.description ?: '-'}">-</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày tạo</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(moneySource.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày cập nhật</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(moneySource.updatedAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                              </dl>
+                    </div>
+          </section>
+</section>
+
+</html>

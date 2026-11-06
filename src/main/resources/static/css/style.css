@@ -114,6 +114,21 @@ body {
           margin-bottom: 30px;
 }
 
+.page-heading-row {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 20px;
+}
+
+.heading-actions,
+.form-actions,
+.table-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+}
+
 .eyebrow {
           margin-bottom: 8px;
           color: var(--muted);
@@ -310,6 +325,172 @@ h2 {
           font-weight: 600;
 }
 
+.filter-panel,
+.data-panel,
+.detail-panel {
+          background: #FFFFFF;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          box-shadow: 0 8px 24px rgba(30, 58, 138, 0.04);
+}
+
+.filter-panel {
+          margin-bottom: 24px;
+          padding: 22px;
+}
+
+.data-panel {
+          overflow: hidden;
+}
+
+.source-table {
+          color: var(--text);
+          font-size: 0.9rem;
+}
+
+.source-table thead th {
+          padding: 15px 16px;
+          color: var(--muted);
+          background: #F8FAFC;
+          border-bottom-color: var(--border);
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          white-space: nowrap;
+}
+
+.source-table tbody td {
+          padding: 16px;
+          border-bottom-color: var(--border);
+          vertical-align: middle;
+}
+
+.source-table tbody tr:last-child td {
+          border-bottom: 0;
+}
+
+.source-name {
+          color: var(--primary-dark);
+          font-weight: 600;
+          text-decoration: none;
+}
+
+.source-name:hover {
+          color: var(--primary);
+          text-decoration: underline;
+}
+
+.source-type-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 5px 9px;
+          color: #1E40AF;
+          background: #EFF6FF;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          white-space: nowrap;
+}
+
+.source-bank {
+          color: #166534;
+          background: #F0FDF4;
+}
+
+.source-e_wallet {
+          color: #9A3412;
+          background: #FFF7ED;
+}
+
+.source-other {
+          color: #475569;
+          background: #F1F5F9;
+}
+
+.amount-text {
+          color: var(--primary-dark);
+          font-weight: 700;
+          white-space: nowrap;
+}
+
+.description-cell {
+          max-width: 220px;
+          overflow: hidden;
+          color: var(--muted);
+          text-overflow: ellipsis;
+          white-space: nowrap;
+}
+
+.empty-state {
+          padding: 64px 24px;
+          text-align: center;
+}
+
+.empty-state-icon {
+          margin-bottom: 16px;
+          color: var(--primary);
+          font-size: 2rem;
+}
+
+.empty-state h2 {
+          font-size: 1.25rem;
+}
+
+.detail-panel {
+          display: flex;
+          gap: 28px;
+          max-width: 760px;
+          padding: 34px;
+}
+
+.detail-icon {
+          display: grid;
+          width: 76px;
+          height: 76px;
+          flex-shrink: 0;
+          place-items: center;
+          color: #FFFFFF;
+          background: var(--primary);
+          border-radius: 50%;
+          font-size: 1.8rem;
+}
+
+.detail-content {
+          width: 100%;
+}
+
+.detail-content h2 {
+          margin-bottom: 10px;
+}
+
+.detail-list {
+          margin: 28px 0 0;
+}
+
+.detail-list>div {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          padding: 14px 0;
+          border-bottom: 1px solid var(--border);
+}
+
+.detail-list>div:last-child {
+          border-bottom: 0;
+}
+
+.detail-list dt {
+          color: var(--muted);
+          font-weight: 400;
+}
+
+.detail-list dd {
+          margin: 0;
+          color: var(--text);
+          text-align: right;
+}
+
 @media (max-width: 768px) {
           .app-body {
                     display: block;
@@ -379,5 +560,38 @@ h2 {
                     align-items: flex-start;
                     flex-direction: column;
                     gap: 4px;
+          }
+
+          .page-heading-row {
+                    align-items: flex-start;
+                    flex-direction: column;
+          }
+
+          .page-heading-row .btn,
+          .heading-actions {
+                    width: 100%;
+          }
+
+          .heading-actions .btn {
+                    flex: 1;
+          }
+
+          .detail-panel {
+                    display: block;
+                    padding: 24px 20px;
+          }
+
+          .detail-icon {
+                    margin-bottom: 22px;
+          }
+
+          .detail-list>div {
+                    align-items: flex-start;
+                    flex-direction: column;
+                    gap: 4px;
+          }
+
+          .detail-list dd {
+                    text-align: left;
           }
 }

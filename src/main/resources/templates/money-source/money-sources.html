@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">TÀI SẢN</p>
+                              <h1>Nguồn tiền</h1>
+                              <p class="text-secondary mb-0">Quản lý các nguồn tiền thuộc tài khoản của bạn.</p>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{/money-sources/new}">Thêm nguồn tiền</a>
+          </div>
+
+          <section class="filter-panel">
+                    <form class="row g-3 align-items-end" th:action="@{/money-sources}" method="get">
+                              <div class="col-md-6">
+                                        <label class="form-label" for="keyword">Tìm theo tên</label>
+                                        <input class="form-control" id="keyword" name="keyword" type="search"
+                                                  th:value="${keyword}" placeholder="Ví dụ: tiền mặt">
+                              </div>
+                              <div class="col-md-4">
+                                        <label class="form-label" for="type">Loại nguồn tiền</label>
+                                        <select class="form-select" id="type" name="type">
+                                                  <option value="">Tất cả loại</option>
+                                                  <option th:each="sourceType : ${moneySourceTypes}"
+                                                            th:value="${sourceType}"
+                                                            th:selected="${selectedType == sourceType}"
+                                                            th:text="${sourceType}">CASH</option>
+                                        </select>
+                              </div>
+                              <div class="col-md-2 d-grid">
+                                        <button class="btn btn-outline-primary" type="submit">Lọc</button>
+                              </div>
+                    </form>
+          </section>
+
+          <section class="data-panel">
+                    <div class="empty-state" th:if="${#lists.isEmpty(moneySources)}">
+                              <div class="empty-state-icon">▣</div>
+                              <h2>Chưa có nguồn tiền</h2>
+                              <p class="text-secondary">Hãy thêm nguồn tiền đầu tiên để bắt đầu quản lý.</p>
+                              <a class="btn btn-primary" th:href="@{/money-sources/new}">Thêm nguồn tiền</a>
+                    </div>
+
+                    <div class="table-responsive" th:unless="${#lists.isEmpty(moneySources)}">
+                              <table class="table source-table align-middle mb-0">
+                                        <thead>
+                                                  <tr>
+                                                            <th>Tên nguồn tiền</th>
+                                                            <th>Loại</th>
+                                                            <th class="text-end">Số dư ban đầu</th>
+                                                            <th>Mô tả</th>
+                                                            <th>Ngày tạo</th>
+                                                            <th class="text-end">Thao tác</th>
+                                                  </tr>
+                                        </thead>
+                                        <tbody>
+                                                  <tr th:each="source : ${moneySources}">
+                                                            <td>
+                                                                      <a class="source-name"
+                                                                                th:href="@{/money-sources/{id}(id=${source.id})}"
+                                                                                th:text="${source.name}">Tiền mặt</a>
+                                                            </td>
+                                                            <td>
+                                                                      <span class="source-type-badge"
+                                                                                th:classappend="' source-' + ${source.type.name().toLowerCase()}">
+                                                                                <span th:switch="${source.type}">
+                                                                                          <span
+                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).CASH}">₫
+                                                                                                    Tiền mặt</span>
+                                                                                          <span
+                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).BANK}">▣
+                                                                                                    Ngân hàng</span>
+                                                                                          <span
+                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).E_WALLET}">◈
+                                                                                                    Ví điện tử</span>
+                                                                                          <span
+                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).OTHER}">●
+                                                                                                    Khác</span>
+                                                                                </span>
+                                                                      </span>
+                                                            </td>
+                                                            <td class="text-end amount-text"
+                                                                      th:text="${#numbers.formatDecimal(source.initialBalance, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td class="description-cell"
+                                                                      th:text="${source.description ?: '-'}">-</td>
+                                                            <td
+                                                                      th:text="${#temporals.format(source.createdAt, 'dd/MM/yyyy')}">
+                                                                      -</td>
+                                                            <td>
+                                                                      <div class="table-actions justify-content-end">
+                                                                                <a class="btn btn-sm btn-outline-secondary"
+                                                                                          th:href="@{/money-sources/{id}(id=${source.id})}">Xem</a>
+                                                                                <a class="btn btn-sm btn-outline-primary"
+                                                                                          th:href="@{/money-sources/{id}/edit(id=${source.id})}">Sửa</a>
+                                                                                <form th:action="@{/money-sources/{id}/delete(id=${source.id})}"
+                                                                                          method="post"
+                                                                                          onsubmit="return confirm('Bạn có chắc muốn xóa nguồn tiền này không?');">
+                                                                                          <input type="hidden"
+                                                                                                    th:name="${_csrf.parameterName}"
+                                                                                                    th:value="${_csrf.token}">
+                                                                                          <button class="btn btn-sm btn-outline-danger"
+                                                                                                    type="submit">Xóa</button>
+                                                                                </form>
+                                                                      </div>
+                                                            </td>
+                                                  </tr>
+                                        </tbody>
+                              </table>
+                    </div>
+          </section>
+</section>
+
+</html>

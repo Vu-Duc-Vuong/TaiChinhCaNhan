@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading">
+                    <p class="eyebrow">NGUỒN TIỀN</p>
+                    <h1 th:text="${editMode ? 'Chỉnh sửa nguồn tiền' : 'Thêm nguồn tiền'}">Thêm nguồn tiền</h1>
+                    <p class="text-secondary mb-0">Số dư hiện tại sẽ được tính cùng các giao dịch ở giai đoạn sau.</p>
+          </div>
+
+          <section class="form-panel form-panel-narrow">
+                    <form th:action="${editMode ? '/money-sources/' + moneySourceId + '/edit' : '/money-sources'}"
+                              th:object="${moneySourceRequest}" method="post">
+                              <div class="mb-3">
+                                        <label class="form-label" for="name">Tên nguồn tiền</label>
+                                        <input class="form-control" id="name" th:field="*{name}" type="text"
+                                                  placeholder="Ví dụ: Tiền mặt cá nhân" th:errorclass="is-invalid">
+                                        <div class="invalid-feedback" th:errors="*{name}"></div>
+                              </div>
+                              <div class="mb-3">
+                                        <label class="form-label" for="type">Loại nguồn tiền</label>
+                                        <select class="form-select" id="type" th:field="*{type}"
+                                                  th:errorclass="is-invalid">
+                                                  <option value="">Chọn loại nguồn tiền</option>
+                                                  <option th:each="sourceType : ${moneySourceTypes}"
+                                                            th:value="${sourceType}" th:text="${sourceType}">CASH
+                                                  </option>
+                                        </select>
+                                        <div class="invalid-feedback" th:errors="*{type}"></div>
+                              </div>
+                              <div class="mb-3">
+                                        <label class="form-label" for="initialBalance">Số dư ban đầu</label>
+                                        <input class="form-control" id="initialBalance" th:field="*{initialBalance}"
+                                                  type="number" min="0" step="0.01" th:errorclass="is-invalid">
+                                        <div class="invalid-feedback" th:errors="*{initialBalance}"></div>
+                              </div>
+                              <div class="mb-4">
+                                        <label class="form-label" for="description">Mô tả</label>
+                                        <textarea class="form-control" id="description" th:field="*{description}"
+                                                  rows="3" placeholder="Thông tin bổ sung nếu có"
+                                                  th:errorclass="is-invalid"></textarea>
+                                        <div class="invalid-feedback" th:errors="*{description}"></div>
+                              </div>
+                              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                              <div class="form-actions">
+                                        <a class="btn btn-secondary" th:href="@{/money-sources}">Hủy</a>
+                                        <button class="btn btn-primary" type="submit"
+                                                  th:text="${editMode ? 'Lưu thay đổi' : 'Thêm nguồn tiền'}">Lưu</button>
+                              </div>
+                    </form>
+          </section>
+</section>
+
+</html>
