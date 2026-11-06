@@ -63,4 +63,55 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                               @Param("categoryId") Long categoryId,
                               @Param("startDate") LocalDate startDate,
                               @Param("endDate") LocalDate endDate);
+
+          @Query("select transaction.type, coalesce(sum(transaction.amount), 0), count(transaction.id) "
+                              + "from Transaction transaction where transaction.userAccount.id = :userId "
+                              + "and transaction.transactionDate between :startDate and :endDate "
+                              + "group by transaction.type")
+          List<Object[]> summarizeByType(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+
+          @Query("select function('YEAR', transaction.transactionDate), function('MONTH', transaction.transactionDate), "
+                              + "transaction.type, coalesce(sum(transaction.amount), 0) "
+                              + "from Transaction transaction where transaction.userAccount.id = :userId "
+                              + "and transaction.transactionDate between :startDate and :endDate "
+                              + "group by function('YEAR', transaction.transactionDate), function('MONTH', transaction.transactionDate), transaction.type "
+                              + "order by function('YEAR', transaction.transactionDate), function('MONTH', transaction.transactionDate)")
+          List<Object[]> summarizeByMonth(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+
+          @Query("select function('YEAR', transaction.transactionDate), transaction.type, "
+                              + "coalesce(sum(transaction.amount), 0) "
+                              + "from Transaction transaction where transaction.userAccount.id = :userId "
+                              + "and transaction.transactionDate between :startDate and :endDate "
+                              + "group by function('YEAR', transaction.transactionDate), transaction.type "
+                              + "order by function('YEAR', transaction.transactionDate)")
+          List<Object[]> summarizeByYear(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+
+          @Query("select transaction.category.name, coalesce(sum(transaction.amount), 0) "
+                              + "from Transaction transaction where transaction.userAccount.id = :userId "
+                              + "and transaction.type = com.example.taichinhcanhan.entity.TransactionType.EXPENSE "
+                              + "and transaction.transactionDate between :startDate and :endDate "
+                              + "group by transaction.category.id, transaction.category.name "
+                              + "order by sum(transaction.amount) desc")
+          List<Object[]> summarizeExpenseByCategory(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+
+          @Query("select transaction.moneySource.name, transaction.type, coalesce(sum(transaction.amount), 0) "
+                              + "from Transaction transaction where transaction.userAccount.id = :userId "
+                              + "and transaction.transactionDate between :startDate and :endDate "
+                              + "group by transaction.moneySource.id, transaction.moneySource.name, transaction.type")
+          List<Object[]> summarizeByMoneySource(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
 }

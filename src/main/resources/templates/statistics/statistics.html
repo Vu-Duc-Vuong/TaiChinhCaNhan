@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">BÁO CÁO</p>
+                              <h1>Thống kê tài chính</h1>
+                              <p class="text-secondary mb-0">Tổng hợp dữ liệu của tài khoản trong khoảng thời gian đã
+                                        chọn.</p>
+                    </div>
+          </div>
+
+          <section class="filter-panel">
+                    <form class="row g-3 align-items-end" th:action="@{/statistics}" method="get">
+                              <div class="col-md-4">
+                                        <label class="form-label" for="startDate">Từ ngày</label>
+                                        <input class="form-control" id="startDate" name="startDate" type="date"
+                                                  th:value="${startDate}">
+                              </div>
+                              <div class="col-md-4">
+                                        <label class="form-label" for="endDate">Đến ngày</label>
+                                        <input class="form-control" id="endDate" name="endDate" type="date"
+                                                  th:value="${endDate}">
+                              </div>
+                              <div class="col-md-4 d-grid">
+                                        <button class="btn btn-outline-primary" type="submit">Cập nhật báo cáo</button>
+                              </div>
+                    </form>
+          </section>
+
+          <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+          <section class="statistics-summary-grid">
+                    <article class="statistics-card">
+                              <span>Tổng thu nhập</span>
+                              <strong class="statistics-income"
+                                        th:text="${#numbers.formatDecimal(report.summary.income, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                              <small th:text="${report.summary.incomeCount + ' giao dịch'}">0 giao dịch</small>
+                    </article>
+                    <article class="statistics-card">
+                              <span>Tổng chi tiêu</span>
+                              <strong class="statistics-expense"
+                                        th:text="${#numbers.formatDecimal(report.summary.expense, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                              <small th:text="${report.summary.expenseCount + ' giao dịch'}">0 giao dịch</small>
+                    </article>
+                    <article class="statistics-card">
+                              <span>Chênh lệch thu chi</span>
+                              <strong th:classappend="${report.summary.difference.signum() >= 0 ? ' statistics-income' : ' statistics-expense'}"
+                                        th:text="${#numbers.formatDecimal(report.summary.difference, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                              <small>Thu nhập - chi tiêu</small>
+                    </article>
+          </section>
+
+          <section class="statistics-chart-grid">
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Thu nhập và chi tiêu theo tháng</h2>
+                                        <span
+                                                  th:text="${#lists.isEmpty(report.monthlyStatistics) ? 'Chưa có dữ liệu' : 'Đơn vị: VNĐ'}">Đơn
+                                                  vị: VNĐ</span>
+                              </div>
+                              <div class="chart-wrap" th:if="${not #lists.isEmpty(report.monthlyStatistics)}">
+                                        <canvas id="monthlyChart"></canvas>
+                              </div>
+                              <div class="empty-state compact-empty"
+                                        th:if="${#lists.isEmpty(report.monthlyStatistics)}">
+                                        <p class="text-secondary mb-0">Chưa có giao dịch trong khoảng thời gian này.</p>
+                              </div>
+                    </article>
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Tỷ lệ chi tiêu theo danh mục</h2>
+                                        <span
+                                                  th:text="${#lists.isEmpty(report.categoryStatistics) ? 'Chưa có dữ liệu' : 'Đơn vị: VNĐ'}">Đơn
+                                                  vị: VNĐ</span>
+                              </div>
+                              <div class="chart-wrap chart-wrap-small"
+                                        th:if="${not #lists.isEmpty(report.categoryStatistics)}">
+                                        <canvas id="categoryChart"></canvas>
+                              </div>
+                              <div class="empty-state compact-empty"
+                                        th:if="${#lists.isEmpty(report.categoryStatistics)}">
+                                        <p class="text-secondary mb-0">Chưa có chi tiêu theo danh mục.</p>
+                              </div>
+                    </article>
+          </section>
+
+          <section class="statistics-panel">
+                    <div class="statistics-panel-heading">
+                              <h2>Thống kê theo năm</h2>
+                    </div>
+                    <div class="table-responsive" th:if="${not #lists.isEmpty(report.yearlyStatistics)}">
+                              <table class="table source-table align-middle mb-0">
+                                        <thead>
+                                                  <tr>
+                                                            <th>Năm</th>
+                                                            <th class="text-end">Thu nhập</th>
+                                                            <th class="text-end">Chi tiêu</th>
+                                                            <th class="text-end">Chênh lệch</th>
+                                                  </tr>
+                                        </thead>
+                                        <tbody>
+                                                  <tr th:each="item : ${report.yearlyStatistics}">
+                                                            <td th:text="${item.period}">2026</td>
+                                                            <td class="text-end statistics-income"
+                                                                      th:text="${#numbers.formatDecimal(item.income, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td class="text-end statistics-expense"
+                                                                      th:text="${#numbers.formatDecimal(item.expense, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                            <td class="text-end"
+                                                                      th:text="${#numbers.formatDecimal(item.difference, 0, 'COMMA', 2, 'POINT')}">
+                                                                      0.00</td>
+                                                  </tr>
+                                        </tbody>
+                              </table>
+                    </div>
+                    <p class="text-secondary mb-0" th:if="${#lists.isEmpty(report.yearlyStatistics)}">Chưa có dữ liệu
+                              theo năm.</p>
+          </section>
+
+          <section class="statistics-data-grid">
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Chi tiêu theo danh mục</h2>
+                              </div>
+                              <div class="table-responsive" th:if="${not #lists.isEmpty(report.categoryStatistics)}">
+                                        <table class="table source-table align-middle mb-0">
+                                                  <thead>
+                                                            <tr>
+                                                                      <th>Danh mục</th>
+                                                                      <th class="text-end">Tổng chi</th>
+                                                                      <th class="text-end">Tỷ lệ</th>
+                                                            </tr>
+                                                  </thead>
+                                                  <tbody>
+                                                            <tr th:each="item : ${report.categoryStatistics}">
+                                                                      <td th:text="${item.categoryName}">Ăn uống</td>
+                                                                      <td class="text-end statistics-expense"
+                                                                                th:text="${#numbers.formatDecimal(item.amount, 0, 'COMMA', 2, 'POINT')}">
+                                                                                0.00</td>
+                                                                      <td class="text-end"
+                                                                                th:text="${item.percent + '%'}">0%</td>
+                                                            </tr>
+                                                  </tbody>
+                                        </table>
+                              </div>
+                              <p class="text-secondary mb-0" th:if="${#lists.isEmpty(report.categoryStatistics)}">Chưa
+                                        có dữ liệu.</p>
+                    </article>
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Dòng tiền theo nguồn</h2>
+                              </div>
+                              <div class="table-responsive" th:if="${not #lists.isEmpty(report.moneySourceStatistics)}">
+                                        <table class="table source-table align-middle mb-0">
+                                                  <thead>
+                                                            <tr>
+                                                                      <th>Nguồn tiền</th>
+                                                                      <th class="text-end">Thu</th>
+                                                                      <th class="text-end">Chi</th>
+                                                                      <th class="text-end">Chuyển vào</th>
+                                                                      <th class="text-end">Chuyển ra</th>
+                                                            </tr>
+                                                  </thead>
+                                                  <tbody>
+                                                            <tr th:each="item : ${report.moneySourceStatistics}">
+                                                                      <td th:text="${item.sourceName}">Tiền mặt</td>
+                                                                      <td class="text-end statistics-income"
+                                                                                th:text="${#numbers.formatDecimal(item.income, 0, 'COMMA', 2, 'POINT')}">
+                                                                                0.00</td>
+                                                                      <td class="text-end statistics-expense"
+                                                                                th:text="${#numbers.formatDecimal(item.expense, 0, 'COMMA', 2, 'POINT')}">
+                                                                                0.00</td>
+                                                                      <td class="text-end"
+                                                                                th:text="${#numbers.formatDecimal(item.transferIn, 0, 'COMMA', 2, 'POINT')}">
+                                                                                0.00</td>
+                                                                      <td class="text-end"
+                                                                                th:text="${#numbers.formatDecimal(item.transferOut, 0, 'COMMA', 2, 'POINT')}">
+                                                                                0.00</td>
+                                                            </tr>
+                                                  </tbody>
+                                        </table>
+                              </div>
+                              <p class="text-secondary mb-0" th:if="${#lists.isEmpty(report.moneySourceStatistics)}">
+                                        Chưa có dữ liệu.</p>
+                    </article>
+          </section>
+
+          <section class="statistics-panel">
+                    <div class="statistics-panel-heading">
+                              <h2>Tình hình ngân sách</h2>
+                    </div>
+                    <div class="budget-grid" th:if="${not #lists.isEmpty(report.budgetSummaries)}">
+                              <article class="budget-card" th:each="summary : ${report.budgetSummaries}"
+                                        th:classappend="' budget-' + ${summary.status.toLowerCase()}">
+                                        <div class="budget-card-heading">
+                                                  <div>
+                                                            <p class="budget-scope"
+                                                                      th:text="${summary.budget.category == null ? 'Ngân sách tổng' : summary.budget.category.name}">
+                                                                      Ngân sách</p>
+                                                            <h2
+                                                                      th:text="${summary.budget.name ?: 'Ngân sách không tên'}">
+                                                                      Ngân sách</h2>
+                                                  </div><span class="budget-status"
+                                                            th:text="${summary.status}">NORMAL</span>
+                                        </div>
+                                        <div class="budget-progress-label"><span>Đã sử dụng</span><strong
+                                                            th:text="${summary.usedPercent + '%'}">0%</strong></div>
+                                        <div class="progress budget-progress">
+                                                  <div class="progress-bar"
+                                                            th:style="'width: ' + (${summary.usedPercent > 100 ? 100 : summary.usedPercent}) + '%'">
+                                                  </div>
+                                        </div>
+                                        <div class="budget-figures">
+                                                  <div><span>Hạn mức</span><strong
+                                                                      th:text="${#numbers.formatDecimal(summary.budget.amount, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                  </div>
+                                                  <div><span>Đã chi</span><strong
+                                                                      th:text="${#numbers.formatDecimal(summary.spent, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                  </div>
+                                                  <div><span>Còn lại</span><strong
+                                                                      th:text="${#numbers.formatDecimal(summary.remaining, 0, 'COMMA', 2, 'POINT')}">0.00</strong>
+                                                  </div>
+                                        </div>
+                              </article>
+                    </div>
+                    <p class="text-secondary mb-0" th:if="${#lists.isEmpty(report.budgetSummaries)}">Chưa có ngân sách.
+                    </p>
+          </section>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+          const monthlyStatistics = /*[[${report.monthlyStatistics}]]*/[];
+          const categoryStatistics = /*[[${report.categoryStatistics}]]*/[];
+          const currencyFormat = new Intl.NumberFormat('vi-VN');
+
+          if (monthlyStatistics.length > 0) {
+                    new Chart(document.getElementById('monthlyChart'), {
+                              type: 'bar',
+                              data: {
+                                        labels: monthlyStatistics.map(item => item.period),
+                                        datasets: [
+                                                  { label: 'Thu nhập', data: monthlyStatistics.map(item => item.income), backgroundColor: '#16A34A' },
+                                                  { label: 'Chi tiêu', data: monthlyStatistics.map(item => item.expense), backgroundColor: '#DC2626' }
+                                        ]
+                              },
+                              options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        scales: { y: { ticks: { callback: value => currencyFormat.format(value) + ' đ' } } }
+                              }
+                    });
+          }
+
+          if (categoryStatistics.length > 0) {
+                    new Chart(document.getElementById('categoryChart'), {
+                              type: 'doughnut',
+                              data: {
+                                        labels: categoryStatistics.map(item => item.categoryName),
+                                        datasets: [{ data: categoryStatistics.map(item => item.amount), backgroundColor: ['#1D4ED8', '#16A34A', '#D97706', '#DC2626', '#7C3AED', '#0891B2'] }]
+                              },
+                              options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { tooltip: { callbacks: { label: context => currencyFormat.format(context.raw) + ' đ' } } }
+                              }
+                    });
+          }
+</script>
+
+</html>

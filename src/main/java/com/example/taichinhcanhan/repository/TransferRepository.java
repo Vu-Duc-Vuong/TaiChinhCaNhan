@@ -32,4 +32,22 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
           Optional<Transfer> findByIdAndUserAccountId(Long id, Long userId);
 
           boolean existsByFromSourceIdOrToSourceId(Long fromSourceId, Long toSourceId);
+
+          @Query("select transfer.fromSource.name, coalesce(sum(transfer.amount), 0) "
+                              + "from Transfer transfer where transfer.userAccount.id = :userId "
+                              + "and transfer.transferDate between :startDate and :endDate "
+                              + "group by transfer.fromSource.id, transfer.fromSource.name")
+          List<Object[]> summarizeOutgoingBySource(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+
+          @Query("select transfer.toSource.name, coalesce(sum(transfer.amount), 0) "
+                              + "from Transfer transfer where transfer.userAccount.id = :userId "
+                              + "and transfer.transferDate between :startDate and :endDate "
+                              + "group by transfer.toSource.id, transfer.toSource.name")
+          List<Object[]> summarizeIncomingBySource(
+                              @Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
 }
