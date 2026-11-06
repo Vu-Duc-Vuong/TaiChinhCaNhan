@@ -1,0 +1,205 @@
+:root {
+          --primary: #1D4ED8;
+          --primary-dark: #1E3A8A;
+          --page-background: #F8FAFC;
+          --text: #1E293B;
+          --muted: #64748B;
+          --border: #E2E8F0;
+          --sidebar-width: 240px;
+}
+
+* {
+          box-sizing: border-box;
+}
+
+body {
+          margin: 0;
+          color: var(--text);
+          background: var(--page-background);
+          font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.app-shell {
+          min-height: 100vh;
+}
+
+.app-navbar {
+          min-height: 64px;
+          background: var(--primary);
+}
+
+.navbar-caption {
+          color: #DBEAFE;
+          font-size: 0.9rem;
+}
+
+.app-body {
+          display: flex;
+          min-height: calc(100vh - 112px);
+}
+
+.sidebar {
+          width: var(--sidebar-width);
+          flex-shrink: 0;
+          padding: 28px 16px;
+          background: #FFFFFF;
+          border-right: 1px solid var(--border);
+}
+
+.sidebar-heading {
+          padding: 0 14px 12px;
+          color: var(--muted);
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+}
+
+.sidebar-nav {
+          display: grid;
+          gap: 6px;
+}
+
+.sidebar-link {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 11px 14px;
+          color: #475569;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          text-decoration: none;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+          color: var(--primary);
+          background: #EFF6FF;
+}
+
+.sidebar-icon {
+          width: 20px;
+          color: currentColor;
+          font-size: 1.1rem;
+          text-align: center;
+}
+
+.main-content {
+          width: 100%;
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 42px clamp(20px, 4vw, 56px);
+}
+
+.page-heading {
+          margin-bottom: 30px;
+}
+
+.eyebrow {
+          margin-bottom: 8px;
+          color: var(--muted);
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+}
+
+h1,
+h2 {
+          margin-bottom: 12px;
+          font-weight: 700;
+          letter-spacing: 0;
+}
+
+h1 {
+          font-size: clamp(1.7rem, 3vw, 2.35rem);
+}
+
+h2 {
+          font-size: 1.45rem;
+}
+
+.welcome-panel {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          min-height: 220px;
+          padding: 34px;
+          background: #FFFFFF;
+          border: 1px solid var(--border);
+          border-left: 5px solid var(--primary);
+          border-radius: 10px;
+          box-shadow: 0 8px 24px rgba(30, 58, 138, 0.06);
+}
+
+.welcome-mark {
+          display: grid;
+          width: 88px;
+          height: 88px;
+          flex-shrink: 0;
+          place-items: center;
+          color: #FFFFFF;
+          background: var(--primary);
+          border-radius: 50%;
+          font-size: 2.4rem;
+          font-weight: 700;
+}
+
+.app-footer {
+          min-height: 48px;
+          padding: 14px 24px;
+          color: var(--muted);
+          background: #FFFFFF;
+          border-top: 1px solid var(--border);
+          font-size: 0.85rem;
+          text-align: center;
+}
+
+@media (max-width: 768px) {
+          .app-body {
+                    display: block;
+          }
+
+          .sidebar {
+                    width: 100%;
+                    padding: 14px 16px;
+                    border-right: 0;
+                    border-bottom: 1px solid var(--border);
+          }
+
+          .sidebar-nav {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .sidebar-link {
+                    padding: 9px 10px;
+          }
+
+          .main-content {
+                    padding-top: 30px;
+          }
+
+          .welcome-panel {
+                    align-items: flex-start;
+                    padding: 26px;
+          }
+
+          .welcome-mark {
+                    width: 64px;
+                    height: 64px;
+                    font-size: 1.8rem;
+          }
+}
+
+@media (max-width: 480px) {
+          .navbar-caption {
+                    display: none;
+          }
+
+          .welcome-panel {
+                    display: block;
+          }
+
+          .welcome-mark {
+                    margin-top: 22px;
+          }
+}

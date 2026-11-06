@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body>
+          <div class="app-shell">
+                    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+                    <div class="app-body">
+                              <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+                              <main class="main-content">
+                                        <div th:replace="~{fragments/messages :: messages}"></div>
+                                        <div th:replace="${content}"></div>
+                              </main>
+                    </div>
+
+                    <div th:replace="~{fragments/footer :: footer}"></div>
+          </div>
+</body>
+
+</html>
