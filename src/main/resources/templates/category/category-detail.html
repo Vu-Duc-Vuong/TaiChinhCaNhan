@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading page-heading-row">
+                    <div>
+                              <p class="eyebrow">DANH MỤC</p>
+                              <h1>Chi tiết danh mục</h1>
+                              <p class="text-secondary mb-0">Thông tin thuộc tài khoản hiện tại.</p>
+                    </div>
+                    <div class="heading-actions">
+                              <a class="btn btn-outline-primary"
+                                        th:href="@{/categories/{id}/edit(id=${category.id})}">Chỉnh sửa</a>
+                              <a class="btn btn-secondary" th:href="@{/categories}">Quay lại</a>
+                    </div>
+          </div>
+
+          <section class="detail-panel">
+                    <div class="detail-icon">☷</div>
+                    <div class="detail-content">
+                              <h2 th:text="${category.name}">Lương</h2>
+                              <span class="source-type-badge"
+                                        th:classappend="' category-' + ${category.type.name().toLowerCase()}"
+                                        th:text="${category.type}">INCOME</span>
+                              <dl class="detail-list">
+                                        <div>
+                                                  <dt>Mô tả</dt>
+                                                  <dd th:text="${category.description ?: '-'}">-</dd>
+                                        </div>
+                                        <div>
+                                                  <dt>Ngày tạo</dt>
+                                                  <dd
+                                                            th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                                            -</dd>
+                                        </div>
+                              </dl>
+                    </div>
+          </section>
+</section>
+
+</html>

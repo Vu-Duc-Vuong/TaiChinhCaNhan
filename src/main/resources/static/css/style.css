@@ -408,6 +408,16 @@ h2 {
           background: #F1F5F9;
 }
 
+.category-income {
+          color: #166534;
+          background: #F0FDF4;
+}
+
+.category-expense {
+          color: #B91C1C;
+          background: #FEF2F2;
+}
+
 .amount-text {
           color: var(--primary-dark);
           font-weight: 700;

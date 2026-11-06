@@ -21,4 +21,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                               LocalDate endDate);
 
           boolean existsByMoneySourceId(Long moneySourceId);
+
+          boolean existsByCategoryId(Long categoryId);
 }
