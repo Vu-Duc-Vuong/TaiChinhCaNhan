@@ -6,6 +6,7 @@ import com.example.taichinhcanhan.dto.FinancialSummary;
 import com.example.taichinhcanhan.dto.MonthlyStatistics;
 import com.example.taichinhcanhan.dto.MoneySourceStatistics;
 import com.example.taichinhcanhan.dto.StatisticsReport;
+import com.example.taichinhcanhan.entity.MoneySourceType;
 import com.example.taichinhcanhan.entity.TransactionType;
 import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
@@ -161,30 +162,42 @@ public class StatisticsService {
           private List<MoneySourceStatistics> buildSources(UserAccount userAccount,
                               LocalDate startDate,
                               LocalDate endDate) {
-                    Map<String, MoneySourceStatistics> values = new LinkedHashMap<>();
+                    Map<Long, MoneySourceStatistics> values = new LinkedHashMap<>();
                     moneySourceRepository.searchByUserId(userAccount.getId(), null, null)
-                                        .forEach(source -> values.put(source.getName(),
-                                                            new MoneySourceStatistics(source.getName())));
+                                        .forEach(source -> values.put(source.getId(),
+                                                            new MoneySourceStatistics(source.getId(), source.getName(),
+                                                                                source.getType())));
 
                     for (Object[] row : transactionRepository.summarizeByMoneySource(userAccount.getId(), startDate,
                                         endDate)) {
-                              MoneySourceStatistics statistics = values.computeIfAbsent(
-                                                  (String) row[0], MoneySourceStatistics::new);
-                              if (row[1] == TransactionType.INCOME) {
-                                        statistics.addIncome(decimal(row[2]));
+                              Long sourceId = ((Number) row[0]).longValue();
+                              String sourceName = (String) row[1];
+                              MoneySourceType sourceType = (MoneySourceType) row[2];
+                              MoneySourceStatistics statistics = values.computeIfAbsent(sourceId,
+                                                  id -> new MoneySourceStatistics(id, sourceName, sourceType));
+                              if (row[3] == TransactionType.INCOME) {
+                                        statistics.addIncome(decimal(row[4]));
                               } else {
-                                        statistics.addExpense(decimal(row[2]));
+                                        statistics.addExpense(decimal(row[4]));
                               }
                     }
                     for (Object[] row : transferRepository.summarizeIncomingBySource(userAccount.getId(), startDate,
                                         endDate)) {
-                              values.computeIfAbsent((String) row[0], MoneySourceStatistics::new)
-                                                  .addTransferIn(decimal(row[1]));
+                              Long sourceId = ((Number) row[0]).longValue();
+                              String sourceName = (String) row[1];
+                              MoneySourceType sourceType = (MoneySourceType) row[2];
+                              values.computeIfAbsent(sourceId,
+                                                  id -> new MoneySourceStatistics(id, sourceName, sourceType))
+                                                  .addTransferIn(decimal(row[3]));
                     }
                     for (Object[] row : transferRepository.summarizeOutgoingBySource(userAccount.getId(), startDate,
                                         endDate)) {
-                              values.computeIfAbsent((String) row[0], MoneySourceStatistics::new)
-                                                  .addTransferOut(decimal(row[1]));
+                              Long sourceId = ((Number) row[0]).longValue();
+                              String sourceName = (String) row[1];
+                              MoneySourceType sourceType = (MoneySourceType) row[2];
+                              values.computeIfAbsent(sourceId,
+                                                  id -> new MoneySourceStatistics(id, sourceName, sourceType))
+                                                  .addTransferOut(decimal(row[3]));
                     }
                     return new ArrayList<>(values.values());
           }

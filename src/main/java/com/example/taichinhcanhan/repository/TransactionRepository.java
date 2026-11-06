@@ -139,10 +139,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate);
 
-  @Query("select transaction.moneySource.name, transaction.type, coalesce(sum(transaction.amount), 0) "
+  @Query("select transaction.moneySource.id, transaction.moneySource.name, transaction.moneySource.type, "
+      + "transaction.type, coalesce(sum(transaction.amount), 0) "
       + "from Transaction transaction where transaction.userAccount.id = :userId "
       + "and transaction.transactionDate between :startDate and :endDate "
-      + "group by transaction.moneySource.id, transaction.moneySource.name, transaction.type")
+      + "group by transaction.moneySource.id, transaction.moneySource.name, transaction.moneySource.type, transaction.type")
   List<Object[]> summarizeByMoneySource(
       @Param("userId") Long userId,
       @Param("startDate") LocalDate startDate,

@@ -68,19 +68,21 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
       @Param("sourceId") Long sourceId,
       @Param("excludedTransferId") Long excludedTransferId);
 
-  @Query("select transfer.fromSource.name, coalesce(sum(transfer.amount), 0) "
+  @Query("select transfer.fromSource.id, transfer.fromSource.name, transfer.fromSource.type, "
+      + "coalesce(sum(transfer.amount), 0) "
       + "from Transfer transfer where transfer.userAccount.id = :userId "
       + "and transfer.transferDate between :startDate and :endDate "
-      + "group by transfer.fromSource.id, transfer.fromSource.name")
+      + "group by transfer.fromSource.id, transfer.fromSource.name, transfer.fromSource.type")
   List<Object[]> summarizeOutgoingBySource(
       @Param("userId") Long userId,
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate);
 
-  @Query("select transfer.toSource.name, coalesce(sum(transfer.amount), 0) "
+  @Query("select transfer.toSource.id, transfer.toSource.name, transfer.toSource.type, "
+      + "coalesce(sum(transfer.amount), 0) "
       + "from Transfer transfer where transfer.userAccount.id = :userId "
       + "and transfer.transferDate between :startDate and :endDate "
-      + "group by transfer.toSource.id, transfer.toSource.name")
+      + "group by transfer.toSource.id, transfer.toSource.name, transfer.toSource.type")
   List<Object[]> summarizeIncomingBySource(
       @Param("userId") Long userId,
       @Param("startDate") LocalDate startDate,
