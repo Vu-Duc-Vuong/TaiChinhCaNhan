@@ -10,6 +10,7 @@ import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.CategoryRepository;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
 import com.example.taichinhcanhan.repository.TransactionRepository;
+import com.example.taichinhcanhan.repository.TransferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,9 @@ class TransactionServiceTest {
           private MoneySourceRepository moneySourceRepository;
 
           @Mock
+          private TransferRepository transferRepository;
+
+          @Mock
           private CategoryRepository categoryRepository;
 
           private TransactionService transactionService;
@@ -49,7 +53,8 @@ class TransactionServiceTest {
           @BeforeEach
           void setUp() {
                     transactionService = new TransactionService(
-                                        transactionRepository, moneySourceRepository, categoryRepository);
+                                        transactionRepository, transferRepository, moneySourceRepository,
+                                        categoryRepository);
 
                     userAccount = new UserAccount();
                     userAccount.setId(1L);
@@ -93,6 +98,20 @@ class TransactionServiceTest {
                     stubCategory(21L);
                     stubSource(10L);
                     stubBalance(10L, null, "0.00", "70.00");
+
+                    assertThrows(IllegalArgumentException.class, () -> transactionService.create(userAccount,
+                                        request(TransactionType.EXPENSE, "31.00", 21L, 10L)));
+
+                    verify(transactionRepository, never()).save(any(Transaction.class));
+          }
+
+          @Test
+          void includesPreviousTransfersWhenCheckingExpenseBalance() {
+                    stubCategory(21L);
+                    stubSource(10L);
+                    stubBalance(10L, null, "0.00", "0.00");
+                    when(transferRepository.sumOutgoingByUserAndSourceExcludingTransfer(1L, 10L, null))
+                                        .thenReturn(new BigDecimal("70.00"));
 
                     assertThrows(IllegalArgumentException.class, () -> transactionService.create(userAccount,
                                         request(TransactionType.EXPENSE, "31.00", 21L, 10L)));
@@ -194,6 +213,10 @@ class TransactionServiceTest {
                     when(transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
                                         1L, sourceId, TransactionType.EXPENSE, excludedTransactionId))
                                         .thenReturn(new BigDecimal(expense));
+                    when(transferRepository.sumIncomingByUserAndSourceExcludingTransfer(1L, sourceId, null))
+                                        .thenReturn(BigDecimal.ZERO);
+                    when(transferRepository.sumOutgoingByUserAndSourceExcludingTransfer(1L, sourceId, null))
+                                        .thenReturn(BigDecimal.ZERO);
           }
 
           private void stubExisting(Transaction transaction) {

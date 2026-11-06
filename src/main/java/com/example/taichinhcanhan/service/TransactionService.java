@@ -9,6 +9,7 @@ import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.CategoryRepository;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
 import com.example.taichinhcanhan.repository.TransactionRepository;
+import com.example.taichinhcanhan.repository.TransferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +23,16 @@ import java.util.TreeSet;
 public class TransactionService {
 
           private final TransactionRepository transactionRepository;
+          private final TransferRepository transferRepository;
           private final MoneySourceRepository moneySourceRepository;
           private final CategoryRepository categoryRepository;
 
           public TransactionService(TransactionRepository transactionRepository,
+                              TransferRepository transferRepository,
                               MoneySourceRepository moneySourceRepository,
                               CategoryRepository categoryRepository) {
                     this.transactionRepository = transactionRepository;
+                    this.transferRepository = transferRepository;
                     this.moneySourceRepository = moneySourceRepository;
                     this.categoryRepository = categoryRepository;
           }
@@ -124,9 +128,15 @@ public class TransactionService {
                     BigDecimal expense = transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
                                         userAccount.getId(), moneySource.getId(), TransactionType.EXPENSE,
                                         excludedTransactionId);
+                    BigDecimal transferIn = transferRepository.sumIncomingByUserAndSourceExcludingTransfer(
+                                        userAccount.getId(), moneySource.getId(), null);
+                    BigDecimal transferOut = transferRepository.sumOutgoingByUserAndSourceExcludingTransfer(
+                                        userAccount.getId(), moneySource.getId(), null);
                     BigDecimal availableBalance = moneySource.getInitialBalance()
                                         .add(income == null ? BigDecimal.ZERO : income)
-                                        .subtract(expense == null ? BigDecimal.ZERO : expense);
+                                        .subtract(expense == null ? BigDecimal.ZERO : expense)
+                                        .add(transferIn == null ? BigDecimal.ZERO : transferIn)
+                                        .subtract(transferOut == null ? BigDecimal.ZERO : transferOut);
                     if (amount.compareTo(availableBalance) > 0) {
                               throw new IllegalArgumentException("Số dư nguồn tiền không đủ cho giao dịch chi tiêu.");
                     }

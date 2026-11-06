@@ -5,23 +5,31 @@ import com.example.taichinhcanhan.entity.MoneySource;
 import com.example.taichinhcanhan.entity.Transfer;
 import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
+import com.example.taichinhcanhan.repository.TransactionRepository;
 import com.example.taichinhcanhan.repository.TransferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 @Service
 public class TransferService {
 
           private final TransferRepository transferRepository;
           private final MoneySourceRepository moneySourceRepository;
+          private final TransactionRepository transactionRepository;
 
           public TransferService(TransferRepository transferRepository,
-                              MoneySourceRepository moneySourceRepository) {
+                              MoneySourceRepository moneySourceRepository,
+                              TransactionRepository transactionRepository) {
                     this.transferRepository = transferRepository;
                     this.moneySourceRepository = moneySourceRepository;
+                    this.transactionRepository = transactionRepository;
           }
 
           @Transactional(readOnly = true)
@@ -39,9 +47,12 @@ public class TransferService {
 
           @Transactional
           public Transfer create(UserAccount userAccount, TransferRequest request) {
-                    MoneySource fromSource = findOwnedSource(request.getFromSourceId(), userAccount);
-                    MoneySource toSource = findOwnedSource(request.getToSourceId(), userAccount);
-                    validateDifferentSources(fromSource, toSource);
+                    validateRequest(request);
+                    Map<Long, MoneySource> sources = lockOwnedSources(
+                                        List.of(request.getFromSourceId(), request.getToSourceId()), userAccount);
+                    MoneySource fromSource = sources.get(request.getFromSourceId());
+                    MoneySource toSource = sources.get(request.getToSourceId());
+                    validateAvailableBalance(fromSource, userAccount, request.getAmount(), null);
 
                     Transfer transfer = new Transfer();
                     applyRequest(transfer, request, fromSource, toSource);
@@ -58,30 +69,80 @@ public class TransferService {
 
           @Transactional
           public Transfer update(Long id, UserAccount userAccount, TransferRequest request) {
-                    Transfer transfer = findOwnedById(id, userAccount);
-                    MoneySource fromSource = findOwnedSource(request.getFromSourceId(), userAccount);
-                    MoneySource toSource = findOwnedSource(request.getToSourceId(), userAccount);
-                    validateDifferentSources(fromSource, toSource);
+                    Transfer transfer = transferRepository.findOwnedByIdForUpdate(id, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                            "Không tìm thấy giao dịch chuyển tiền."));
+                    validateRequest(request);
+                    Map<Long, MoneySource> sources = lockOwnedSources(List.of(
+                                        transfer.getFromSource().getId(), transfer.getToSource().getId(),
+                                        request.getFromSourceId(), request.getToSourceId()), userAccount);
+                    MoneySource fromSource = sources.get(request.getFromSourceId());
+                    MoneySource toSource = sources.get(request.getToSourceId());
+                    validateAvailableBalance(fromSource, userAccount, request.getAmount(), id);
                     applyRequest(transfer, request, fromSource, toSource);
                     return transferRepository.save(transfer);
           }
 
           @Transactional
           public void delete(Long id, UserAccount userAccount) {
-                    Transfer transfer = findOwnedById(id, userAccount);
+                    Transfer transfer = transferRepository.findOwnedByIdForUpdate(id, userAccount.getId())
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                            "Không tìm thấy giao dịch chuyển tiền."));
+                    lockOwnedSources(List.of(transfer.getFromSource().getId(), transfer.getToSource().getId()),
+                                        userAccount);
                     transferRepository.delete(transfer);
           }
 
-          private MoneySource findOwnedSource(Long sourceId, UserAccount userAccount) {
-                    return moneySourceRepository.findByIdAndUserAccountId(sourceId, userAccount.getId())
-                                        .orElseThrow(() -> new IllegalArgumentException(
-                                                            "Nguồn tiền không thuộc người dùng hiện tại."));
-          }
-
-          private void validateDifferentSources(MoneySource fromSource, MoneySource toSource) {
-                    if (fromSource.getId().equals(toSource.getId())) {
+          private void validateRequest(TransferRequest request) {
+                    if (request.getAmount() == null || request.getAmount().signum() <= 0) {
+                              throw new IllegalArgumentException("Số tiền chuyển phải lớn hơn 0.");
+                    }
+                    if (request.getFromSourceId() == null || request.getToSourceId() == null) {
+                              throw new IllegalArgumentException("Vui lòng chọn nguồn tiền chuyển đi và nhận.");
+                    }
+                    if (request.getFromSourceId().equals(request.getToSourceId())) {
                               throw new IllegalArgumentException("Nguồn tiền chuyển đi và nhận phải khác nhau.");
                     }
+          }
+
+          private Map<Long, MoneySource> lockOwnedSources(List<Long> sourceIds, UserAccount userAccount) {
+                    Map<Long, MoneySource> sources = new HashMap<>();
+                    for (Long sourceId : new TreeSet<>(sourceIds)) {
+                              MoneySource source = moneySourceRepository.findOwnedByIdForUpdate(
+                                                  sourceId, userAccount.getId())
+                                                  .orElseThrow(() -> new IllegalArgumentException(
+                                                                      "Nguồn tiền không thuộc người dùng hiện tại."));
+                              sources.put(sourceId, source);
+                    }
+                    return sources;
+          }
+
+          private void validateAvailableBalance(MoneySource source,
+                              UserAccount userAccount,
+                              BigDecimal amount,
+                              Long excludedTransferId) {
+                    BigDecimal income = transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
+                                        userAccount.getId(), source.getId(),
+                                        com.example.taichinhcanhan.entity.TransactionType.INCOME, null);
+                    BigDecimal expense = transactionRepository.sumByUserAndSourceAndTypeExcludingTransaction(
+                                        userAccount.getId(), source.getId(),
+                                        com.example.taichinhcanhan.entity.TransactionType.EXPENSE, null);
+                    BigDecimal transferIn = transferRepository.sumIncomingByUserAndSourceExcludingTransfer(
+                                        userAccount.getId(), source.getId(), excludedTransferId);
+                    BigDecimal transferOut = transferRepository.sumOutgoingByUserAndSourceExcludingTransfer(
+                                        userAccount.getId(), source.getId(), excludedTransferId);
+                    BigDecimal availableBalance = source.getInitialBalance()
+                                        .add(zeroIfNull(income))
+                                        .subtract(zeroIfNull(expense))
+                                        .add(zeroIfNull(transferIn))
+                                        .subtract(zeroIfNull(transferOut));
+                    if (amount.compareTo(availableBalance) > 0) {
+                              throw new IllegalArgumentException("Số dư nguồn tiền chuyển đi không đủ.");
+                    }
+          }
+
+          private BigDecimal zeroIfNull(BigDecimal amount) {
+                    return amount == null ? BigDecimal.ZERO : amount;
           }
 
           private void applyRequest(Transfer transfer,

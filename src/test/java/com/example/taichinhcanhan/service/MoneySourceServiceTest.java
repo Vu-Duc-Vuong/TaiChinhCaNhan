@@ -3,6 +3,7 @@ package com.example.taichinhcanhan.service;
 import com.example.taichinhcanhan.entity.MoneySource;
 import com.example.taichinhcanhan.entity.MoneySourceType;
 import com.example.taichinhcanhan.entity.TransactionType;
+import com.example.taichinhcanhan.entity.Transfer;
 import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
 import com.example.taichinhcanhan.repository.TransactionRepository;
@@ -55,6 +56,8 @@ class MoneySourceServiceTest {
                     when(transactionRepository.summarizeBalancesByUserId(1L)).thenReturn(List.of(
                                         new Object[] { 10L, TransactionType.INCOME, new BigDecimal("1000000.00") },
                                         new Object[] { 10L, TransactionType.EXPENSE, new BigDecimal("500000.00") }));
+                    when(transferRepository.summarizeIncomingBalancesByUserId(1L)).thenReturn(List.of());
+                    when(transferRepository.summarizeOutgoingBalancesByUserId(1L)).thenReturn(List.of());
 
                     List<MoneySource> result = moneySourceService.search(userAccount, null, null);
 
@@ -71,9 +74,56 @@ class MoneySourceServiceTest {
 
                     when(moneySourceRepository.searchByUserId(1L, "cash", null)).thenReturn(List.of(source));
                     when(transactionRepository.summarizeBalancesByUserId(1L)).thenReturn(List.of());
+                    when(transferRepository.summarizeIncomingBalancesByUserId(1L)).thenReturn(List.of());
+                    when(transferRepository.summarizeOutgoingBalancesByUserId(1L)).thenReturn(List.of());
 
                     List<MoneySource> result = moneySourceService.search(userAccount, "cash", null);
 
                     assertEquals(new BigDecimal("125.50"), result.get(0).getCurrentBalance());
+          }
+
+          @Test
+          void appliesIncomingAndOutgoingTransfersWithoutChangingTotalAssets() {
+                    MoneySource sourceA = source(10L, "2000000.00");
+                    MoneySource sourceB = source(11L, "3000000.00");
+                    when(moneySourceRepository.searchByUserId(1L, null, null))
+                                        .thenReturn(List.of(sourceA, sourceB));
+                    when(transactionRepository.summarizeBalancesByUserId(1L)).thenReturn(List.of());
+                    when(transferRepository.summarizeIncomingBalancesByUserId(1L)).thenReturn(List.<Object[]>of(
+                                        new Object[] { 11L, new BigDecimal("500000.00") }));
+                    when(transferRepository.summarizeOutgoingBalancesByUserId(1L)).thenReturn(List.<Object[]>of(
+                                        new Object[] { 10L, new BigDecimal("500000.00") }));
+
+                    List<MoneySource> sources = moneySourceService.search(userAccount, null, null);
+
+                    assertEquals(new BigDecimal("1500000.00"), sources.get(0).getCurrentBalance());
+                    assertEquals(new BigDecimal("3500000.00"), sources.get(1).getCurrentBalance());
+                    assertEquals(new BigDecimal("5000000.00"), sources.get(0).getCurrentBalance()
+                                        .add(sources.get(1).getCurrentBalance()));
+          }
+
+          @Test
+          void combinesIncomeExpenseAndTransfersInCurrentBalance() {
+                    MoneySource source = source(10L, "2000000.00");
+                    when(moneySourceRepository.searchByUserId(1L, null, null)).thenReturn(List.of(source));
+                    when(transactionRepository.summarizeBalancesByUserId(1L)).thenReturn(List.of(
+                                        new Object[] { 10L, TransactionType.INCOME, new BigDecimal("1000000.00") },
+                                        new Object[] { 10L, TransactionType.EXPENSE, new BigDecimal("500000.00") }));
+                    when(transferRepository.summarizeIncomingBalancesByUserId(1L)).thenReturn(List.<Object[]>of(
+                                        new Object[] { 10L, new BigDecimal("300000.00") }));
+                    when(transferRepository.summarizeOutgoingBalancesByUserId(1L)).thenReturn(List.<Object[]>of(
+                                        new Object[] { 10L, new BigDecimal("100000.00") }));
+
+                    MoneySource result = moneySourceService.search(userAccount, null, null).get(0);
+
+                    assertEquals(new BigDecimal("2700000.00"), result.getCurrentBalance());
+          }
+
+          private MoneySource source(Long id, String initialBalance) {
+                    MoneySource source = new MoneySource();
+                    source.setId(id);
+                    source.setInitialBalance(new BigDecimal(initialBalance));
+                    source.setUserAccount(userAccount);
+                    return source;
           }
 }

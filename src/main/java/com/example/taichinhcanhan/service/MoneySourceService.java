@@ -106,6 +106,20 @@ public class MoneySourceService {
                                                   : balance.subtract(amount);
                               balances.put(sourceId, balance);
                     }
+                    for (Object[] row : transferRepository.summarizeIncomingBalancesByUserId(userAccount.getId())) {
+                              Long sourceId = ((Number) row[0]).longValue();
+                              BigDecimal balance = balances.get(sourceId);
+                              if (balance != null) {
+                                        balances.put(sourceId, balance.add((BigDecimal) row[1]));
+                              }
+                    }
+                    for (Object[] row : transferRepository.summarizeOutgoingBalancesByUserId(userAccount.getId())) {
+                              Long sourceId = ((Number) row[0]).longValue();
+                              BigDecimal balance = balances.get(sourceId);
+                              if (balance != null) {
+                                        balances.put(sourceId, balance.subtract((BigDecimal) row[1]));
+                              }
+                    }
                     moneySources.forEach(source -> source.setCurrentBalance(balances.get(source.getId())));
           }
 
