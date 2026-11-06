@@ -102,7 +102,7 @@ public class TransactionService {
           }
 
           private Category findOwnedCategory(Long categoryId, UserAccount userAccount) {
-                    return categoryRepository.findByIdAndUserAccountId(categoryId, userAccount.getId())
+                    return categoryRepository.findOwnedByIdForUpdate(categoryId, userAccount.getId())
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                             "Danh mục không thuộc người dùng hiện tại."));
           }

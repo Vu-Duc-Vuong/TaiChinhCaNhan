@@ -16,6 +16,7 @@ public class BudgetRequest {
           @DecimalMin(value = "0.01", message = "Ngân sách phải lớn hơn 0.")
           private BigDecimal amount;
 
+          @NotNull(message = "Vui lòng chọn danh mục chi tiêu cho ngân sách.")
           private Long categoryId;
 
           @NotNull(message = "Vui lòng chọn ngày bắt đầu.")

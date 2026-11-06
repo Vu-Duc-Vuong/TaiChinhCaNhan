@@ -43,13 +43,12 @@ public class BudgetService {
           public List<BudgetSummary> search(UserAccount userAccount,
                               String keyword,
                               Long categoryId,
-                              Boolean overall,
                               LocalDate startDate,
                               LocalDate endDate,
                               String status) {
                     String normalizedKeyword = keyword == null ? null : keyword.trim();
                     return budgetRepository.searchByUserId(
-                                        userAccount.getId(), normalizedKeyword, categoryId, overall, startDate, endDate)
+                                        userAccount.getId(), normalizedKeyword, categoryId, startDate, endDate)
                                         .stream()
                                         .map(this::toSummary)
                                         .filter(summary -> status == null || status.isBlank()
@@ -98,9 +97,11 @@ public class BudgetService {
 
           private BudgetSummary toSummary(Budget budget) {
                     Long categoryId = budget.getCategory() == null ? null : budget.getCategory().getId();
-                    BigDecimal spent = transactionRepository.sumExpenseForBudget(
-                                        budget.getUserAccount().getId(), categoryId, budget.getStartDate(),
-                                        budget.getEndDate());
+                    BigDecimal spent = categoryId == null
+                                        ? BigDecimal.ZERO
+                                        : transactionRepository.sumExpenseForBudget(
+                                                            budget.getUserAccount().getId(), categoryId,
+                                                            budget.getStartDate(), budget.getEndDate());
                     if (spent == null) {
                               spent = BigDecimal.ZERO;
                     }
@@ -122,9 +123,10 @@ public class BudgetService {
 
           private Category findCategoryForBudget(Long categoryId, UserAccount userAccount) {
                     if (categoryId == null) {
-                              return null;
+                              throw new IllegalArgumentException(
+                                                  "Vui lòng chọn danh mục chi tiêu cho ngân sách.");
                     }
-                    Category category = categoryRepository.findByIdAndUserAccountId(categoryId, userAccount.getId())
+                    Category category = categoryRepository.findOwnedByIdForUpdate(categoryId, userAccount.getId())
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                             "Danh mục không thuộc người dùng hiện tại."));
                     if (category.getType() != CategoryType.EXPENSE) {
@@ -137,9 +139,9 @@ public class BudgetService {
                               BudgetRequest request,
                               Category category,
                               Long budgetId) {
-                    Long categoryId = category == null ? null : category.getId();
                     if (budgetRepository.existsOverlappingBudget(
-                                        userAccount.getId(), categoryId, request.getStartDate(), request.getEndDate(),
+                                        userAccount.getId(), category.getId(), request.getStartDate(),
+                                        request.getEndDate(),
                                         budgetId)) {
                               throw new IllegalArgumentException(
                                                   "Đã tồn tại ngân sách cùng phạm vi trong khoảng thời gian bị chồng lấn.");

@@ -57,6 +57,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   boolean existsByCategoryId(Long categoryId);
 
+  boolean existsByCategoryIdAndTypeNot(Long categoryId, TransactionType type);
+
   Optional<Transaction> findByIdAndUserAccountId(Long id, Long userId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -87,7 +89,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
       where transaction.userAccount.id = :userId
         and transaction.type = com.example.taichinhcanhan.entity.TransactionType.EXPENSE
         and transaction.transactionDate between :startDate and :endDate
-        and (:categoryId is null or transaction.category.id = :categoryId)
+        and transaction.category.id = :categoryId
       """)
   BigDecimal sumExpenseForBudget(
       @Param("userId") Long userId,

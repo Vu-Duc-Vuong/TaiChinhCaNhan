@@ -26,17 +26,7 @@
                                                             th:text="${category.name}">Ăn uống</option>
                                         </select>
                               </div>
-                              <div class="col-lg-2 col-md-6">
-                                        <label class="form-label" for="overall">Phạm vi</label>
-                                        <select class="form-select" id="overall" name="overall">
-                                                  <option value="">Tất cả</option>
-                                                  <option value="true" th:selected="${selectedOverall == true}">Ngân
-                                                            sách tổng</option>
-                                                  <option value="false" th:selected="${selectedOverall == false}">Theo
-                                                            danh mục</option>
-                                        </select>
-                              </div>
-                              <div class="col-lg-2 col-md-6">
+                              <div class="col-lg-3 col-md-6">
                                         <label class="form-label" for="status">Trạng thái</label>
                                         <select class="form-select" id="status" name="status">
                                                   <option value="">Tất cả</option>
@@ -49,7 +39,7 @@
                                                   </option>
                                         </select>
                               </div>
-                              <div class="col-lg-2 col-md-6 d-grid">
+                              <div class="col-lg-3 col-md-6 d-grid">
                                         <button class="btn btn-outline-primary" type="submit">Lọc</button>
                               </div>
                               <div class="col-lg-3 col-md-6">
@@ -62,7 +52,7 @@
                                         <input class="form-control" id="endDate" name="endDate" type="date"
                                                   th:value="${endDate}">
                               </div>
-                              <div class="col-lg-2 col-md-6 d-grid">
+                              <div class="col-lg-3 col-md-6 d-grid">
                                         <a class="btn btn-outline-secondary" th:href="@{/budgets}">Xóa bộ lọc</a>
                               </div>
                     </form>
@@ -74,8 +64,8 @@
                               <div class="budget-card-heading">
                                         <div>
                                                   <p class="budget-scope"
-                                                            th:text="${summary.budget.category == null ? 'Ngân sách tổng' : summary.budget.category.name}">
-                                                            Ngân sách tổng</p>
+                                                            th:text="${summary.budget.category == null ? 'Chưa gắn danh mục' : summary.budget.category.name}">
+                                                            Chưa gắn danh mục</p>
                                                   <h2 th:text="${summary.budget.name ?: 'Ngân sách không tên'}">Ngân
                                                             sách</h2>
                                         </div>

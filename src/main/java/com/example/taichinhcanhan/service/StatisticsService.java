@@ -50,7 +50,7 @@ public class StatisticsService {
                     List<CategoryStatistics> categories = buildCategories(userAccount, startDate, endDate,
                                         summary.getExpense());
                     List<MoneySourceStatistics> sources = buildSources(userAccount, startDate, endDate);
-                    List<BudgetSummary> budgets = budgetService.search(userAccount, null, null, null, null, null, null);
+                    List<BudgetSummary> budgets = budgetService.search(userAccount, null, null, null, null, null);
 
                     return new StatisticsReport(startDate, endDate, summary, monthly, yearly, categories, sources,
                                         budgets);

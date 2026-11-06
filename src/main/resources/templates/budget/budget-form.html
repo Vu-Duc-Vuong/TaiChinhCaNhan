@@ -4,7 +4,7 @@
           <div class="page-heading">
                     <p class="eyebrow">KẾ HOẠCH CHI TIÊU</p>
                     <h1 th:text="${editMode ? 'Chỉnh sửa ngân sách' : 'Thêm ngân sách'}">Thêm ngân sách</h1>
-                    <p class="text-secondary mb-0">Ngân sách tổng không gắn với một danh mục cụ thể.</p>
+                    <p class="text-secondary mb-0">Mỗi ngân sách cần gắn với một danh mục chi tiêu.</p>
           </div>
 
           <section class="form-panel form-panel-narrow">
@@ -28,12 +28,14 @@
                               </div>
                               <div class="mb-3">
                                         <label class="form-label" for="categoryId">Danh mục chi tiêu</label>
-                                        <select class="form-select" id="categoryId" th:field="*{categoryId}">
-                                                  <option value="">Ngân sách tổng</option>
+                                        <select class="form-select" id="categoryId" th:field="*{categoryId}" required
+                                                  th:errorclass="is-invalid">
+                                                  <option value="">Chọn danh mục chi tiêu</option>
                                                   <option th:each="category : ${categories}" th:value="${category.id}"
                                                             th:text="${category.name}">Ăn uống</option>
                                         </select>
                                         <div class="form-text">Chỉ có thể chọn danh mục loại EXPENSE.</div>
+                                        <div class="invalid-feedback" th:errors="*{categoryId}"></div>
                               </div>
                               <div class="row g-3 mb-3">
                                         <div class="col-md-6">

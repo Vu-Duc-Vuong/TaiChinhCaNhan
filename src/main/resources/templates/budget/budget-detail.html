@@ -19,8 +19,8 @@
                     <div class="detail-icon">▤</div>
                     <div class="detail-content">
                               <p class="budget-scope"
-                                        th:text="${summary.budget.category == null ? 'Ngân sách tổng' : summary.budget.category.name}">
-                                        Ngân sách tổng</p>
+                                        th:text="${summary.budget.category == null ? 'Chưa gắn danh mục' : summary.budget.category.name}">
+                                        Chưa gắn danh mục</p>
                               <h2 th:text="${summary.budget.name ?: 'Ngân sách không tên'}">Ngân sách</h2>
                               <span class="budget-status"
                                         th:text="${summary.status == 'NORMAL' ? 'Bình thường' : (summary.status == 'WARNING' ? 'Sắp hết' : 'Đã vượt')}">Bình

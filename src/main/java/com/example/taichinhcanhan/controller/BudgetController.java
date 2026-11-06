@@ -44,13 +44,12 @@ public class BudgetController {
           public String list(@AuthenticationPrincipal UserDetails userDetails,
                               @RequestParam(required = false) String keyword,
                               @RequestParam(required = false) Long categoryId,
-                              @RequestParam(required = false) Boolean overall,
                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                               @RequestParam(required = false) String status,
                               Model model) {
                     UserAccount userAccount = currentUser(userDetails);
-                    prepareListModel(model, userAccount, keyword, categoryId, overall, startDate, endDate, status);
+                    prepareListModel(model, userAccount, keyword, categoryId, startDate, endDate, status);
                     return "budget/budgets";
           }
 
@@ -160,18 +159,16 @@ public class BudgetController {
                               UserAccount userAccount,
                               String keyword,
                               Long categoryId,
-                              Boolean overall,
                               LocalDate startDate,
                               LocalDate endDate,
                               String status) {
                     model.addAttribute("pageTitle", "Ngân sách");
                     model.addAttribute("currentUserName", userAccount.getUsername());
                     model.addAttribute("summaries", budgetService.search(
-                                        userAccount, keyword, categoryId, overall, startDate, endDate, status));
+                                        userAccount, keyword, categoryId, startDate, endDate, status));
                     model.addAttribute("categories", expenseCategories(userAccount));
                     model.addAttribute("keyword", keyword == null ? "" : keyword);
                     model.addAttribute("selectedCategoryId", categoryId);
-                    model.addAttribute("selectedOverall", overall);
                     model.addAttribute("startDate", startDate);
                     model.addAttribute("endDate", endDate);
                     model.addAttribute("selectedStatus", status);

@@ -227,7 +227,7 @@ class TransactionServiceTest {
 
           private void stubCategory(Long categoryId) {
                     Category category = categoryId.equals(20L) ? incomeCategory : expenseCategory;
-                    when(categoryRepository.findByIdAndUserAccountId(categoryId, 1L))
+                    when(categoryRepository.findOwnedByIdForUpdate(categoryId, 1L))
                                         .thenReturn(Optional.of(category));
           }
 
