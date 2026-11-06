@@ -241,45 +241,45 @@
                     <p class="text-secondary mb-0" th:if="${#lists.isEmpty(report.budgetSummaries)}">Chưa có ngân sách.
                     </p>
           </section>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+          <script th:inline="javascript">
+                    const monthlyStatistics = /*[[${report.monthlyStatistics}]]*/[];
+                    const categoryStatistics = /*[[${report.categoryStatistics}]]*/[];
+                    const currencyFormat = new Intl.NumberFormat('vi-VN');
+
+                    if (monthlyStatistics.length > 0) {
+                              new Chart(document.getElementById('monthlyChart'), {
+                                        type: 'bar',
+                                        data: {
+                                                  labels: monthlyStatistics.map(item => item.period),
+                                                  datasets: [
+                                                            { label: 'Thu nhập', data: monthlyStatistics.map(item => item.income), backgroundColor: '#16A34A' },
+                                                            { label: 'Chi tiêu', data: monthlyStatistics.map(item => item.expense), backgroundColor: '#DC2626' }
+                                                  ]
+                                        },
+                                        options: {
+                                                  responsive: true,
+                                                  maintainAspectRatio: false,
+                                                  scales: { y: { ticks: { callback: value => currencyFormat.format(value) + ' đ' } } }
+                                        }
+                              });
+                    }
+
+                    if (categoryStatistics.length > 0) {
+                              new Chart(document.getElementById('categoryChart'), {
+                                        type: 'doughnut',
+                                        data: {
+                                                  labels: categoryStatistics.map(item => item.categoryName),
+                                                  datasets: [{ data: categoryStatistics.map(item => item.amount), backgroundColor: ['#1D4ED8', '#16A34A', '#D97706', '#DC2626', '#7C3AED', '#0891B2'] }]
+                                        },
+                                        options: {
+                                                  responsive: true,
+                                                  maintainAspectRatio: false,
+                                                  plugins: { tooltip: { callbacks: { label: context => currencyFormat.format(context.raw) + ' đ' } } }
+                                        }
+                              });
+                    }
+          </script>
 </section>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script th:inline="javascript">
-          const monthlyStatistics = /*[[${report.monthlyStatistics}]]*/[];
-          const categoryStatistics = /*[[${report.categoryStatistics}]]*/[];
-          const currencyFormat = new Intl.NumberFormat('vi-VN');
-
-          if (monthlyStatistics.length > 0) {
-                    new Chart(document.getElementById('monthlyChart'), {
-                              type: 'bar',
-                              data: {
-                                        labels: monthlyStatistics.map(item => item.period),
-                                        datasets: [
-                                                  { label: 'Thu nhập', data: monthlyStatistics.map(item => item.income), backgroundColor: '#16A34A' },
-                                                  { label: 'Chi tiêu', data: monthlyStatistics.map(item => item.expense), backgroundColor: '#DC2626' }
-                                        ]
-                              },
-                              options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        scales: { y: { ticks: { callback: value => currencyFormat.format(value) + ' đ' } } }
-                              }
-                    });
-          }
-
-          if (categoryStatistics.length > 0) {
-                    new Chart(document.getElementById('categoryChart'), {
-                              type: 'doughnut',
-                              data: {
-                                        labels: categoryStatistics.map(item => item.categoryName),
-                                        datasets: [{ data: categoryStatistics.map(item => item.amount), backgroundColor: ['#1D4ED8', '#16A34A', '#D97706', '#DC2626', '#7C3AED', '#0891B2'] }]
-                              },
-                              options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: { tooltip: { callbacks: { label: context => currencyFormat.format(context.raw) + ' đ' } } }
-                              }
-                    });
-          }
-</script>
 
 </html>
