@@ -6,6 +6,7 @@ import com.example.taichinhcanhan.entity.MoneySourceType;
 import com.example.taichinhcanhan.entity.UserAccount;
 import com.example.taichinhcanhan.repository.MoneySourceRepository;
 import com.example.taichinhcanhan.repository.TransactionRepository;
+import com.example.taichinhcanhan.repository.TransferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +17,14 @@ public class MoneySourceService {
 
           private final MoneySourceRepository moneySourceRepository;
           private final TransactionRepository transactionRepository;
+          private final TransferRepository transferRepository;
 
           public MoneySourceService(MoneySourceRepository moneySourceRepository,
-                              TransactionRepository transactionRepository) {
+                              TransactionRepository transactionRepository,
+                              TransferRepository transferRepository) {
                     this.moneySourceRepository = moneySourceRepository;
                     this.transactionRepository = transactionRepository;
+                    this.transferRepository = transferRepository;
           }
 
           @Transactional(readOnly = true)
@@ -55,6 +59,10 @@ public class MoneySourceService {
                     MoneySource moneySource = findOwnedById(id, userAccount);
                     if (transactionRepository.existsByMoneySourceId(moneySource.getId())) {
                               throw new IllegalStateException("Không thể xóa nguồn tiền đã có giao dịch liên quan.");
+                    }
+                    if (transferRepository.existsByFromSourceIdOrToSourceId(moneySource.getId(), moneySource.getId())) {
+                              throw new IllegalStateException(
+                                                  "Không thể xóa nguồn tiền đang được sử dụng trong chuyển tiền.");
                     }
                     moneySourceRepository.delete(moneySource);
           }
