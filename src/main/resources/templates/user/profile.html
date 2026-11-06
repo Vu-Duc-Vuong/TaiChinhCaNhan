@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
+<section th:fragment="content">
+          <div class="page-heading">
+                    <p class="eyebrow">TÀI KHOẢN</p>
+                    <h1>Thông tin cá nhân</h1>
+                    <p class="text-secondary mb-0">Quản lý thông tin cơ bản của tài khoản hiện tại.</p>
+          </div>
+
+          <section class="form-panel">
+                    <div class="form-panel-heading">
+                              <h2>Thông tin tài khoản</h2>
+                              <p class="text-secondary mb-0">Username không thể thay đổi.</p>
+                    </div>
+
+                    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                              <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+                    </div>
+
+                    <form th:action="@{/profile}" th:object="${updateProfileRequest}" method="post">
+                              <div class="mb-3">
+                                        <label class="form-label" for="username">Username</label>
+                                        <input class="form-control" id="username" th:value="${userAccount.username}"
+                                                  type="text" disabled>
+                              </div>
+                              <div class="mb-3">
+                                        <label class="form-label" for="email">Email</label>
+                                        <input class="form-control" id="email" th:field="*{email}" type="email"
+                                                  autocomplete="email" th:errorclass="is-invalid">
+                                        <div class="invalid-feedback" th:errors="*{email}"></div>
+                              </div>
+                              <div class="mb-3">
+                                        <label class="form-label" for="fullName">Họ và tên</label>
+                                        <input class="form-control" id="fullName" th:field="*{fullName}" type="text"
+                                                  autocomplete="name" th:errorclass="is-invalid">
+                                        <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                              </div>
+                              <div class="account-meta">
+                                        <span>Ngày tạo tài khoản</span>
+                                        <strong
+                                                  th:text="${#temporals.format(userAccount.createdAt, 'dd/MM/yyyy HH:mm')}">-</strong>
+                              </div>
+                              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                              <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+                    </form>
+          </section>
+</section>
+
+</html>

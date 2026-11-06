@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head}"></head>
+
+<body class="auth-page">
+          <main class="auth-shell">
+                    <a class="auth-brand" th:href="@{/login}">Tài chính cá nhân</a>
+
+                    <section class="auth-card auth-card-wide">
+                              <div class="auth-heading">
+                                        <p class="eyebrow text-primary">TẠO TÀI KHOẢN</p>
+                                        <h1>Đăng ký</h1>
+                                        <p class="text-secondary mb-0">Bắt đầu quản lý tài chính cá nhân của bạn.</p>
+                              </div>
+
+                              <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                                        <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}">
+                                        </p>
+                              </div>
+
+                              <form th:action="@{/register}" th:object="${registerRequest}" method="post"
+                                        class="auth-form">
+                                        <div class="row g-3">
+                                                  <div class="col-md-6">
+                                                            <label class="form-label" for="username">Username</label>
+                                                            <input class="form-control" id="username"
+                                                                      th:field="*{username}" type="text"
+                                                                      autocomplete="username"
+                                                                      th:errorclass="is-invalid">
+                                                            <div class="invalid-feedback" th:errors="*{username}"></div>
+                                                  </div>
+                                                  <div class="col-md-6">
+                                                            <label class="form-label" for="email">Email</label>
+                                                            <input class="form-control" id="email" th:field="*{email}"
+                                                                      type="email" autocomplete="email"
+                                                                      th:errorclass="is-invalid">
+                                                            <div class="invalid-feedback" th:errors="*{email}"></div>
+                                                  </div>
+                                                  <div class="col-12">
+                                                            <label class="form-label" for="fullName">Họ và tên</label>
+                                                            <input class="form-control" id="fullName"
+                                                                      th:field="*{fullName}" type="text"
+                                                                      autocomplete="name" th:errorclass="is-invalid">
+                                                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                                                  </div>
+                                                  <div class="col-md-6">
+                                                            <label class="form-label" for="password">Mật khẩu</label>
+                                                            <div class="password-field">
+                                                                      <input class="form-control" id="password"
+                                                                                th:field="*{password}" type="password"
+                                                                                autocomplete="new-password"
+                                                                                th:errorclass="is-invalid">
+                                                                      <button class="password-toggle" type="button"
+                                                                                data-target="password">Hiện</button>
+                                                            </div>
+                                                            <div class="invalid-feedback" th:errors="*{password}"></div>
+                                                  </div>
+                                                  <div class="col-md-6">
+                                                            <label class="form-label" for="confirmPassword">Xác nhận mật
+                                                                      khẩu</label>
+                                                            <div class="password-field">
+                                                                      <input class="form-control" id="confirmPassword"
+                                                                                th:field="*{confirmPassword}"
+                                                                                type="password"
+                                                                                autocomplete="new-password"
+                                                                                th:errorclass="is-invalid">
+                                                                      <button class="password-toggle" type="button"
+                                                                                data-target="confirmPassword">Hiện</button>
+                                                            </div>
+                                                            <div class="invalid-feedback"
+                                                                      th:errors="*{confirmPassword}"></div>
+                                                  </div>
+                                        </div>
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <button class="btn btn-primary w-100 mt-4" type="submit">Tạo tài khoản</button>
+                              </form>
+
+                              <p class="auth-switch">Đã có tài khoản? <a th:href="@{/login}">Đăng nhập</a></p>
+                    </section>
+          </main>
+          <script th:src="@{/js/auth.js}"></script>
+</body>
+
+</html>

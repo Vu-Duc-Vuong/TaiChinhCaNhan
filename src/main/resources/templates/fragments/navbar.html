@@ -3,6 +3,12 @@
                     <a class="navbar-brand text-white fw-semibold" th:href="@{/}">
                               Tài chính cá nhân
                     </a>
-                    <span class="navbar-caption">Quản lý đơn giản, rõ ràng</span>
+                    <div class="navbar-actions">
+                              <a class="navbar-user" th:href="@{/profile}" th:text="${currentUserName}">Người dùng</a>
+                              <form th:action="@{/logout}" method="post">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <button class="btn btn-outline-light btn-sm" type="submit">Đăng xuất</button>
+                              </form>
+                    </div>
           </div>
 </nav>
