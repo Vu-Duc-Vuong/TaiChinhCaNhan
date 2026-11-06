@@ -14,13 +14,15 @@
                                         <p class="text-secondary mb-0">Bắt đầu quản lý tài chính cá nhân của bạn.</p>
                               </div>
 
-                              <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
-                                        <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}">
-                                        </p>
-                              </div>
-
                               <form th:action="@{/register}" th:object="${registerRequest}" method="post"
                                         class="auth-form">
+                                        <div class="alert alert-danger"
+                                                  th:if="${#fields != null and #fields.hasGlobalErrors()}">
+                                                  <p class="mb-0" th:each="error : ${#fields.globalErrors()}"
+                                                            th:text="${error}">
+                                                  </p>
+                                        </div>
+
                                         <div class="row g-3">
                                                   <div class="col-md-6">
                                                             <label class="form-label" for="username">Username</label>

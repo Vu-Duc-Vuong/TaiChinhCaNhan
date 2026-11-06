@@ -8,11 +8,12 @@
           </div>
 
           <section class="form-panel form-panel-narrow">
-                    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
-                              <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
-                    </div>
                     <form th:action="${editMode ? '/transactions/' + transactionId + '/edit' : '/transactions'}"
                               th:object="${transactionRequest}" method="post">
+                              <div class="alert alert-danger" th:if="${#fields != null and #fields.hasGlobalErrors()}">
+                                        <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}">
+                                        </p>
+                              </div>
                               <div class="mb-3">
                                         <label class="form-label" for="type">Loại giao dịch</label>
                                         <select class="form-select" id="type" th:field="*{type}"

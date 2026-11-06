@@ -24,7 +24,7 @@
                                                   <option th:each="sourceType : ${moneySourceTypes}"
                                                             th:value="${sourceType}"
                                                             th:selected="${selectedType == sourceType}"
-                                                            th:text="${sourceType}">CASH</option>
+                                                            th:text="${sourceType.displayName}">Tiền mặt</option>
                                         </select>
                               </div>
                               <div class="col-md-2 d-grid">
@@ -63,20 +63,9 @@
                                                             <td>
                                                                       <span class="source-type-badge"
                                                                                 th:classappend="' source-' + ${source.type.name().toLowerCase()}">
-                                                                                <span th:switch="${source.type}">
-                                                                                          <span
-                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).CASH}">₫
-                                                                                                    Tiền mặt</span>
-                                                                                          <span
-                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).BANK}">▣
-                                                                                                    Ngân hàng</span>
-                                                                                          <span
-                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).E_WALLET}">◈
-                                                                                                    Ví điện tử</span>
-                                                                                          <span
-                                                                                                    th:case="${T(com.example.taichinhcanhan.entity.MoneySourceType).OTHER}">●
-                                                                                                    Khác</span>
-                                                                                </span>
+                                                                                <span
+                                                                                          th:text="${source.type.displayName}">Tiền
+                                                                                          mặt</span>
                                                                       </span>
                                                             </td>
                                                             <td class="text-end amount-text"

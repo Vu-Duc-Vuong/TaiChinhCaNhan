@@ -9,11 +9,12 @@
           </div>
 
           <section class="form-panel form-panel-narrow">
-                    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
-                              <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
-                    </div>
                     <form th:action="${editMode ? '/categories/' + categoryId + '/edit' : '/categories'}"
                               th:object="${categoryRequest}" method="post">
+                              <div class="alert alert-danger" th:if="${#fields != null and #fields.hasGlobalErrors()}">
+                                        <p class="mb-0" th:each="error : ${#fields.globalErrors()}" th:text="${error}">
+                                        </p>
+                              </div>
                               <div class="mb-3">
                                         <label class="form-label" for="name">Tên danh mục</label>
                                         <input class="form-control" id="name" th:field="*{name}" type="text"

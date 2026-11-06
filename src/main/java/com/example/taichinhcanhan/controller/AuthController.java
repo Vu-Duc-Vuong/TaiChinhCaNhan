@@ -1,5 +1,6 @@
 package com.example.taichinhcanhan.controller;
 
+import com.example.taichinhcanhan.dto.ForgotPasswordRequest;
 import com.example.taichinhcanhan.dto.RegisterRequest;
 import com.example.taichinhcanhan.service.UserAccountService;
 import jakarta.validation.Valid;
@@ -40,6 +41,28 @@ public class AuthController {
                     model.addAttribute("pageTitle", "Đăng ký");
                     model.addAttribute("registerRequest", new RegisterRequest());
                     return "auth/register";
+          }
+
+          @GetMapping("/forgot-password")
+          public String showForgotPassword(Model model) {
+                    model.addAttribute("pageTitle", "Quên mật khẩu");
+                    model.addAttribute("forgotPasswordRequest", new ForgotPasswordRequest());
+                    return "auth/forgot-password";
+          }
+
+          @PostMapping("/forgot-password")
+          public String processForgotPassword(
+                              @Valid @ModelAttribute("forgotPasswordRequest") ForgotPasswordRequest request,
+                              BindingResult bindingResult,
+                              Model model,
+                              RedirectAttributes redirectAttributes) {
+                    if (bindingResult.hasErrors()) {
+                              model.addAttribute("pageTitle", "Quên mật khẩu");
+                              return "auth/forgot-password";
+                    }
+
+                    redirectAttributes.addFlashAttribute("resetEmailSent", true);
+                    return "redirect:/login";
           }
 
           @PostMapping("/register")

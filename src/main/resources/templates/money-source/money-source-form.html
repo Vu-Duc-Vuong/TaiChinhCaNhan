@@ -22,7 +22,8 @@
                                                   th:errorclass="is-invalid">
                                                   <option value="">Chọn loại nguồn tiền</option>
                                                   <option th:each="sourceType : ${moneySourceTypes}"
-                                                            th:value="${sourceType}" th:text="${sourceType}">CASH
+                                                            th:value="${sourceType}"
+                                                            th:text="${sourceType.displayName}">Tiền mặt
                                                   </option>
                                         </select>
                                         <div class="invalid-feedback" th:errors="*{type}"></div>

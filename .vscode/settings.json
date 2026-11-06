@@ -1,0 +1,4 @@
+{
+          "java.compile.nullAnalysis.mode": "automatic",
+          "chat.disableAIFeatures": false
+}
