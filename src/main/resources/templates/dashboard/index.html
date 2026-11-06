@@ -1,27 +1,174 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::content})}">
 <section th:fragment="content">
-          <div class="page-heading">
+          <div class="page-heading page-heading-row">
                     <div>
                               <p class="eyebrow">TỔNG QUAN</p>
-                              <h1>Chào mừng đến với hệ thống</h1>
-                              <p class="text-secondary mb-0">
-                                        Theo dõi và quản lý tài chính cá nhân trong một không gian rõ ràng, dễ sử dụng.
-                              </p>
+                              <h1>Tổng quan tài chính</h1>
+                              <p class="text-secondary mb-0" th:text="${dashboard.currentMonthLabel}">Tháng hiện tại</p>
                     </div>
+                    <a class="btn btn-primary" th:href="@{/transactions/new}">Thêm giao dịch</a>
           </div>
 
-          <section class="welcome-panel">
-                    <div>
-                              <p class="eyebrow text-primary">BẮT ĐẦU</p>
-                              <h2>Quản lý tài chính chủ động hơn</h2>
-                              <p class="text-secondary mb-0">
-                                        Các chức năng nguồn tiền, giao dịch, ngân sách và báo cáo sẽ được triển khai
-                                        theo từng giai đoạn.
-                              </p>
-                    </div>
-                    <div class="welcome-mark" aria-hidden="true">₫</div>
+          <section class="statistics-summary-grid dashboard-summary-grid">
+                    <article class="statistics-card">
+                              <span>Tổng tài sản</span>
+                              <strong
+                                        th:text="${#numbers.formatDecimal(dashboard.totalAssets, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        đ</strong>
+                              <small>Tổng số dư hiện tại của các nguồn tiền</small>
+                    </article>
+                    <article class="statistics-card">
+                              <span>Thu nhập</span>
+                              <strong class="statistics-income"
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.income, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        đ</strong>
+                              <small>Trong tháng này</small>
+                    </article>
+                    <article class="statistics-card">
+                              <span>Chi tiêu</span>
+                              <strong class="statistics-expense"
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.expense, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        đ</strong>
+                              <small>Trong tháng này</small>
+                    </article>
+                    <article class="statistics-card">
+                              <span>Chênh lệch thu chi</span>
+                              <strong th:classappend="${dashboard.monthlySummary.difference.signum() >= 0 ? ' statistics-income' : ' statistics-expense'}"
+                                        th:text="${#numbers.formatDecimal(dashboard.monthlySummary.difference, 1, 'COMMA', 2, 'POINT') + ' đ'}">0.00
+                                        đ</strong>
+                              <small>Thu nhập trừ chi tiêu trong tháng</small>
+                    </article>
           </section>
+
+          <section class="statistics-data-grid">
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Nguồn tiền</h2>
+                                        <a th:href="@{/money-sources}">Xem tất cả</a>
+                              </div>
+                              <div class="empty-state compact-empty" th:if="${#lists.isEmpty(dashboard.moneySources)}">
+                                        <p class="text-secondary mb-0">Chưa có nguồn tiền.</p>
+                                        <a class="btn btn-primary mt-3" th:href="@{/money-sources/new}">Thêm nguồn
+                                                  tiền</a>
+                              </div>
+                              <div class="table-responsive" th:unless="${#lists.isEmpty(dashboard.moneySources)}">
+                                        <table class="table source-table align-middle mb-0">
+                                                  <thead>
+                                                            <tr>
+                                                                      <th>Nguồn tiền</th>
+                                                                      <th>Loại</th>
+                                                                      <th class="text-end">Ban đầu</th>
+                                                                      <th class="text-end">Hiện tại</th>
+                                                            </tr>
+                                                  </thead>
+                                                  <tbody>
+                                                            <tr th:each="source : ${dashboard.moneySources}">
+                                                                      <td><a class="source-name"
+                                                                                          th:href="@{/money-sources/{id}(id=${source.id})}"
+                                                                                          th:text="${source.name}">Nguồn
+                                                                                          tiền</a></td>
+                                                                      <td th:text="${source.type.displayName}">Tiền mặt
+                                                                      </td>
+                                                                      <td class="text-end"
+                                                                                th:text="${#numbers.formatDecimal(source.initialBalance, 1, 'COMMA', 2, 'POINT') + ' đ'}">
+                                                                                0.00 đ</td>
+                                                                      <td class="text-end amount-text"
+                                                                                th:text="${#numbers.formatDecimal(source.currentBalance, 1, 'COMMA', 2, 'POINT') + ' đ'}">
+                                                                                0.00 đ</td>
+                                                            </tr>
+                                                  </tbody>
+                                        </table>
+                              </div>
+                    </article>
+
+                    <article class="statistics-panel">
+                              <div class="statistics-panel-heading">
+                                        <h2>Giao dịch gần đây</h2>
+                                        <a th:href="@{/transactions}">Xem tất cả</a>
+                              </div>
+                              <div class="empty-state compact-empty"
+                                        th:if="${#lists.isEmpty(dashboard.recentTransactions)}">
+                                        <p class="text-secondary mb-0">Chưa có giao dịch.</p>
+                                        <a class="btn btn-primary mt-3" th:href="@{/transactions/new}">Thêm giao
+                                                  dịch</a>
+                              </div>
+                              <div class="table-responsive" th:unless="${#lists.isEmpty(dashboard.recentTransactions)}">
+                                        <table class="table source-table align-middle mb-0">
+                                                  <thead>
+                                                            <tr>
+                                                                      <th>Giao dịch</th>
+                                                                      <th>Danh mục</th>
+                                                                      <th>Nguồn tiền</th>
+                                                                      <th>Loại</th>
+                                                                      <th class="text-end">Số tiền</th>
+                                                            </tr>
+                                                  </thead>
+                                                  <tbody>
+                                                            <tr th:each="transaction : ${dashboard.recentTransactions}">
+                                                                      <td>
+                                                                                <a class="source-name"
+                                                                                          th:href="@{/transactions/{id}(id=${transaction.id})}"
+                                                                                          th:text="${transaction.description ?: 'Giao dịch'}">Giao
+                                                                                          dịch</a>
+                                                                                <small class="d-block text-secondary"
+                                                                                          th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}">01/01/2026</small>
+                                                                      </td>
+                                                                      <td th:text="${transaction.category.name}">Danh
+                                                                                mục</td>
+                                                                      <td th:text="${transaction.moneySource.name}">
+                                                                                Nguồn tiền</td>
+                                                                      <td
+                                                                                th:text="${transaction.type.name() == 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}">
+                                                                                Thu nhập</td>
+                                                                      <td class="text-end"
+                                                                                th:classappend="${transaction.type.name() == 'INCOME' ? ' statistics-income' : ' statistics-expense'}"
+                                                                                th:text="${(transaction.type.name() == 'INCOME' ? '+ ' : '- ') + #numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT') + ' đ'}">
+                                                                                0.00 đ</td>
+                                                            </tr>
+                                                  </tbody>
+                                        </table>
+                              </div>
+                    </article>
+          </section>
+
+          <section class="statistics-panel">
+                    <div class="statistics-panel-heading">
+                              <h2>Thu nhập và chi tiêu theo tháng</h2>
+                              <span>Từ đầu năm đến hiện tại · VNĐ</span>
+                    </div>
+                    <div class="chart-wrap" th:if="${not #lists.isEmpty(dashboard.monthlyStatistics)}">
+                              <canvas id="dashboardMonthlyChart"
+                                        aria-label="Biểu đồ thu nhập và chi tiêu theo tháng"></canvas>
+                    </div>
+                    <div class="empty-state compact-empty" th:if="${#lists.isEmpty(dashboard.monthlyStatistics)}">
+                              <p class="text-secondary mb-0">Chưa có dữ liệu thu chi trong năm nay.</p>
+                    </div>
+          </section>
+
+          <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+          <script th:inline="javascript">
+                    const dashboardMonthlyStatistics = /*[[${dashboard.monthlyStatistics}]]*/[];
+                    if (dashboardMonthlyStatistics.length > 0) {
+                              const dashboardCurrencyFormat = new Intl.NumberFormat('vi-VN');
+                              new Chart(document.getElementById('dashboardMonthlyChart'), {
+                                        type: 'bar',
+                                        data: {
+                                                  labels: dashboardMonthlyStatistics.map(item => item.period),
+                                                  datasets: [
+                                                            { label: 'Thu nhập', data: dashboardMonthlyStatistics.map(item => item.income), backgroundColor: '#16A34A' },
+                                                            { label: 'Chi tiêu', data: dashboardMonthlyStatistics.map(item => item.expense), backgroundColor: '#DC2626' }
+                                                  ]
+                                        },
+                                        options: {
+                                                  responsive: true,
+                                                  maintainAspectRatio: false,
+                                                  scales: { y: { ticks: { callback: value => dashboardCurrencyFormat.format(value) + ' đ' } } },
+                                                  plugins: { tooltip: { callbacks: { label: context => context.dataset.label + ': ' + dashboardCurrencyFormat.format(context.raw) + ' đ' } } }
+                                        }
+                              });
+                    }
+          </script>
 </section>
 
 </html>

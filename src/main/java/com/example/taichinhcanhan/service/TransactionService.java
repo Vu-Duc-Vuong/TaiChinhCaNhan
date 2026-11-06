@@ -12,6 +12,7 @@ import com.example.taichinhcanhan.repository.TransactionRepository;
 import com.example.taichinhcanhan.repository.TransferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -49,6 +50,13 @@ public class TransactionService {
                     return transactionRepository.searchByUserId(
                                         userAccount.getId(), normalizedKeyword, type, moneySourceId, categoryId,
                                         startDate, endDate);
+          }
+
+          @Transactional(readOnly = true)
+          public List<Transaction> recent(UserAccount userAccount, int limit) {
+                    int pageSize = Math.max(1, limit);
+                    return transactionRepository.findRecentByUserId(
+                                        userAccount.getId(), PageRequest.of(0, pageSize));
           }
 
           @Transactional

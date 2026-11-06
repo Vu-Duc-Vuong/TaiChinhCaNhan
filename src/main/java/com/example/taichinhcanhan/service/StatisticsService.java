@@ -42,9 +42,7 @@ public class StatisticsService {
 
           @Transactional(readOnly = true)
           public StatisticsReport buildReport(UserAccount userAccount, LocalDate startDate, LocalDate endDate) {
-                    if (startDate.isAfter(endDate)) {
-                              throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc.");
-                    }
+                    validateDateRange(startDate, endDate);
 
                     FinancialSummary summary = buildSummary(userAccount, startDate, endDate);
                     List<MonthlyStatistics> monthly = buildMonthly(userAccount, startDate, endDate);
@@ -56,6 +54,26 @@ public class StatisticsService {
 
                     return new StatisticsReport(startDate, endDate, summary, monthly, yearly, categories, sources,
                                         budgets);
+          }
+
+          @Transactional(readOnly = true)
+          public FinancialSummary getSummary(UserAccount userAccount, LocalDate startDate, LocalDate endDate) {
+                    validateDateRange(startDate, endDate);
+                    return buildSummary(userAccount, startDate, endDate);
+          }
+
+          @Transactional(readOnly = true)
+          public List<MonthlyStatistics> getMonthlyStatistics(UserAccount userAccount,
+                              LocalDate startDate,
+                              LocalDate endDate) {
+                    validateDateRange(startDate, endDate);
+                    return buildMonthly(userAccount, startDate, endDate);
+          }
+
+          private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+                    if (startDate.isAfter(endDate)) {
+                              throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc.");
+                    }
           }
 
           private FinancialSummary buildSummary(UserAccount userAccount, LocalDate startDate, LocalDate endDate) {
