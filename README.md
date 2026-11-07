@@ -94,6 +94,6 @@ TaiChinhCaNhan/
    - Trên Windows: `.\mvnw spring-boot:run`
 3. Mở http://localhost:8080
 4. Chạy kiểm thử: `./mvnw test`
-
+* Tài khoản test : test - 12345678
 ## 8. Thành viên
 - Vũ Đức Vượng - 24100383
