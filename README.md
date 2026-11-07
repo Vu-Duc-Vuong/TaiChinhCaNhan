@@ -29,22 +29,22 @@ thu chi, quản lý nhiều nguồn tiền, đặt ngân sách và xem báo cáo
 
 ## 5. Kiến trúc hệ thống
 Ứng dụng theo mô hình **MVC nhiều tầng** (Controller – Service – Repository),
-giao diện được render phía server bằng Thymeleaf.
+giao diện được dựng phía máy chủ bằng Thymeleaf.
 
 ```
 Người dùng (trình duyệt)
-   │  HTTP (form / HTML)
+   │  HTTP (biểu mẫu / HTML)
    ▼
 Spring Boot (:8080)
    ├── Spring Security      # xác thực, phân quyền, mã hóa mật khẩu BCrypt
-   ├── Controller           # nhận request, validate dữ liệu (DTO)
+   ├── Controller           # nhận yêu cầu, kiểm tra dữ liệu đầu vào (DTO)
    │      ▼
    ├── Service              # xử lý nghiệp vụ (số dư, ngân sách, thống kê...)
    │      ▼
    ├── Repository           # Spring Data JPA / Hibernate
    │      ▼
    │   MySQL (Aiven, kết nối SSL)
-   └── Thymeleaf            # render HTML, kèm Bootstrap + Chart.js (CDN)
+   └── Thymeleaf            # dựng giao diện HTML, kèm Bootstrap + Chart.js (CDN)
 ```
 
 Các thực thể chính và quan hệ:
@@ -56,24 +56,24 @@ Các thực thể chính và quan hệ:
 ## 6. Cấu trúc dự án
 ```
 TaiChinhCaNhan/
-├── pom.xml                         # Khai báo dependency Maven
+├── pom.xml                         # Khai báo thư viện Maven
 ├── mvnw, mvnw.cmd, .mvn/           # Maven Wrapper
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/taichinhcanhan/
-│   │   │   ├── TaiChinhCaNhanApplication.java   # Điểm khởi chạy
-│   │   │   ├── config/        # Cấu hình Spring Security, tài khoản mặc định
-│   │   │   ├── controller/    # Xử lý request: Auth, Dashboard, MoneySource,
-│   │   │   │                  #   Transaction, Category, Transfer, Budget,
-│   │   │   │                  #   Statistics, UserAccount
-│   │   │   ├── service/       # Logic nghiệp vụ cho từng chức năng
+│   │   │   ├── TaiChinhCaNhanApplication.java   # Điểm khởi chạy ứng dụng
+│   │   │   ├── config/        # Cấu hình bảo mật, tài khoản mặc định
+│   │   │   ├── controller/    # Xử lý yêu cầu: xác thực, tổng quan, nguồn tiền,
+│   │   │   │                  #   giao dịch, danh mục, chuyển tiền, ngân sách,
+│   │   │   │                  #   thống kê, người dùng
+│   │   │   ├── service/       # Xử lý nghiệp vụ cho từng chức năng
 │   │   │   ├── repository/    # Truy cập dữ liệu (Spring Data JPA)
-│   │   │   ├── entity/        # Entity JPA và enum (loại giao dịch, danh mục, nguồn tiền)
-│   │   │   └── dto/           # Đối tượng request/response, dữ liệu thống kê
+│   │   │   ├── entity/        # Thực thể JPA và kiểu liệt kê (loại giao dịch, danh mục, nguồn tiền)
+│   │   │   └── dto/           # Đối tượng truyền dữ liệu: yêu cầu, kết quả thống kê
 │   │   └── resources/
-│   │       ├── application.properties   # Cấu hình ứng dụng và database
+│   │       ├── application.properties   # Cấu hình ứng dụng và cơ sở dữ liệu
 │   │       ├── templates/               # Giao diện Thymeleaf
-│   │       │   ├── layout.html, fragments/   # Bố cục chung, header, sidebar...
+│   │       │   ├── layout.html, fragments/   # Bố cục chung, đầu trang, thanh bên...
 │   │       │   ├── auth/, user/              # Đăng nhập, đăng ký, hồ sơ
 │   │       │   ├── dashboard/, statistics/   # Tổng quan, thống kê
 │   │       │   └── money-source/, transaction/,
@@ -82,8 +82,8 @@ TaiChinhCaNhan/
 │   │           ├── css/style.css
 │   │           └── js/                  # auth.js, money-input.js
 │   └── test/java/com/example/taichinhcanhan/
-│       ├── service/                     # Unit test cho các service
-│       └── AuthPageIntegrationTest.java # Test tích hợp trang đăng nhập/đăng ký
+│       ├── service/                     # Kiểm thử đơn vị cho các service
+│       └── AuthPageIntegrationTest.java # Kiểm thử tích hợp trang đăng nhập/đăng ký
 └── README.md
 ```
 
