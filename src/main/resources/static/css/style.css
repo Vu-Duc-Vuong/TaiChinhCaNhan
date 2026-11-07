@@ -456,6 +456,37 @@ h2 {
           white-space: nowrap;
 }
 
+.dashboard-recent-transactions {
+          table-layout: fixed;
+          width: 100%;
+}
+
+.dashboard-recent-transactions th:nth-child(1) {
+          width: 24%;
+}
+
+.dashboard-recent-transactions th:nth-child(2) {
+          width: 17%;
+}
+
+.dashboard-recent-transactions th:nth-child(3) {
+          width: 14%;
+}
+
+.dashboard-recent-transactions th:nth-child(4) {
+          width: 17%;
+}
+
+.dashboard-recent-transactions th:nth-child(5) {
+          width: 28%;
+}
+
+.dashboard-money-source-cell {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+}
+
 .transaction-income-text {
           color: #15803D;
 }

@@ -70,7 +70,7 @@
                                                                                           tiền</a></td>
                                                                       <td th:text="${source.type.displayName}">Tiền mặt
                                                                       </td>
-                                                                      <td class="text-end"
+                                                                      <td class="text-end amount-text"
                                                                                 th:text="${#numbers.formatDecimal(source.initialBalance, 1, 'POINT', 0, 'POINT') + ' đ'}">
                                                                                 0 đ</td>
                                                                       <td class="text-end amount-text"
@@ -94,12 +94,12 @@
                                                   dịch</a>
                               </div>
                               <div class="table-responsive" th:unless="${#lists.isEmpty(dashboard.recentTransactions)}">
-                                        <table class="table source-table align-middle mb-0">
+                                        <table class="table source-table dashboard-recent-transactions align-middle mb-0">
                                                   <thead>
                                                             <tr>
                                                                       <th>Giao dịch</th>
                                                                       <th>Danh mục</th>
-                                                                      <th>Nguồn tiền</th>
+                                                                      <th>Nguồn</th>
                                                                       <th>Loại</th>
                                                                       <th class="text-end">Số tiền</th>
                                                             </tr>
@@ -116,12 +116,14 @@
                                                                       </td>
                                                                       <td th:text="${transaction.category.name}">Danh
                                                                                 mục</td>
-                                                                      <td th:text="${transaction.moneySource.name}">
+                                                                      <td class="dashboard-money-source-cell"
+                                                                                th:title="${transaction.moneySource.name}"
+                                                                                th:text="${transaction.moneySource.name}">
                                                                                 Nguồn tiền</td>
                                                                       <td
                                                                                 th:text="${transaction.type.name() == 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}">
                                                                                 Thu nhập</td>
-                                                                      <td class="text-end"
+                                                                      <td class="text-end transaction-amount"
                                                                                 th:classappend="${transaction.type.name() == 'INCOME' ? ' statistics-income' : ' statistics-expense'}"
                                                                                 th:text="${(transaction.type.name() == 'INCOME' ? '+ ' : '- ') + #numbers.formatDecimal(transaction.amount, 1, 'POINT', 0, 'POINT') + ' đ'}">
                                                                                 0 đ</td>
